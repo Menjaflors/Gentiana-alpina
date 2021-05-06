@@ -77,8 +77,6 @@ envs <- raster::stack(userRas.paths1961_2000)
 # extract environmental values at occ grid cells
 locs.vals <- raster::extract(envs[[1]], occs[, c('longitude', 'latitude')])  
 
-#No entenc que locs.vals sigui un vector... pensava que seria una taula.
-
 # remove occs without environmental values
 occs <- occs[!is.na(locs.vals), ]  
 
