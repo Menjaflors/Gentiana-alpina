@@ -44,7 +44,7 @@ current workspace, change to the correct file path
 
 ```{r}
 # NOTE: provide the path to the folder that contains the CSV file
-d.occs <- 'D:/Users/munozferrandiz/Documents/MODEL1961_2000/ocs' 
+d.occs <- 'D:/quercus/Projets/Gentiana_Alpina_David/ocs' 
 # create path to user occurrences csv file
 userOccs.path <- file.path(d.occs, "GENTIANA_ALPINAfiltrada.csv")
 # read in csv
@@ -66,7 +66,7 @@ bioclimatic dataset at resolution of 2.5 arcmin.
 
 ```{r}
 # NOTE: provide the path to the folder that contains the rasters
-d.envs1961_2000 <- 'D:/Users/munozferrandiz/Documents/MODEL1961_2000/Biovars/mitjanes'
+d.envs1961_2000 <- 'D:/quercus/Projets/Gentiana_Alpina_David/Biovars/mitjanes'
 
 
 # create paths to the raster files
@@ -94,7 +94,7 @@ Read a .csv file and generate a Spatial Polygon object.
 
 ```{r}
 # NOTE: provide the full path to the CSV file
-csvPath <- 'D:/Users/munozferrandiz/Documents/MODEL1961_2000/ocs/AREA_ESTUDI.csv'
+csvPath <- 'D:/quercus/Projets/Gentiana_Alpina_David/ocs/AREA_ESTUDI.csv'
 # read csv with coordinates for polygon
 shp <- read.csv(csvPath, header = TRUE)
 bgExt <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(shp)), 1)))
@@ -177,15 +177,15 @@ rms <- seq(1, 2, 1)
 e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
                           method = 'user', occs.grp, bg.grp, clamp = TRUE, algorithm = "maxnet")
 
-
-                                        #MAXENT O MAXNET?
+#A dalt està posat Maxnet, ja es el que toca o hem de canviar a maxent? Maxent triga molt menys
 
 #save the model
 readr::write_rds (e, 'ENM_models.rds')
 
 #if you needed to reload the model
-#e <- readr::read_rds (e, 'ENM_models.rds')             #ARA NO L'OBRIM, SINÓ QUE DIRECTAMENT EL MANTENIM OBERT. TOT I AIXÍ, HAUREM DE TROBAR LA MANERA D'OBRIR-LO BÉ!!!!!!!!!!!!!!!!!!!!!!!!!
+#e <- readr::read_rds (e, 'ENM_models.rds')             
 #e <- readr::read_rds (file='ENM_models.rds')
+
 #with javascript (NOT IMPLEMENTED)
 # ejar <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
 #                           method = 'user', occs.grp, bg.grp, clamp = TRUE, algorithm = "maxent.jar")
@@ -201,6 +201,8 @@ evalPreds <- e@predictions
 ```{r}
 # view response curves for environmental variables with non-zero coefficients
 dismo::response(evalMods[["L_1"]], var = c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
+
+#Aquí és on surt l'error. 
 
 ```
 
@@ -225,4 +227,4 @@ plot(pred)
 ```
 
 
-
+#AQUÍ A BAIX HI HAURÉ D'AFEGIR ALTRES ASPECTES COM ALTRES MÈTODES D'AVALUACIÓ DEL MODEL, I TAMBÉ LA PRÒPIA PROJECCIÓ. SÓN A PROVA_AFEGIT_WALLACE_1961_2000.RMD
