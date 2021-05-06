@@ -1,0 +1,303 @@
+Please find below the R code history from your *Wallace* v1.0.6.3
+session.
+
+You can reproduce your session results by running this R Markdown file
+in RStudio.
+
+Each code block is called a “chunk”, and you can run them either
+one-by-one or all at once by choosing an option in the “Run” menu at the
+top-right corner of the “Source” pane in RStudio.
+
+For more detailed information see
+<a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>).
+
+### Package installation
+
+Wallace uses the following R packages that must be installed and loaded
+before starting.
+
+```{r}
+library(spocc)
+library(spThin)
+library(dismo)
+library(rgeos)
+library(ENMeval)
+library(dplyr)
+library (tidyverse)
+```
+
+Wallace also includes several functions developed to help integrate
+different packages and some additional functionality. For this reason,
+it is necessary to load the file `functions.R`, The function
+`system.file()` finds this script, and `source()` loads it.
+
+```{r}
+source(system.file('shiny/funcs', 'functions.R', package = 'wallace'))
+```
+
+Record of analysis for \*\*.
+----------------------------
+
+User CSV path with occurrence data. If the CSV file is not in the
+current workspace, change to the correct file path
+(e.g. “/Users/darwin/Documents/occs.csv”).
+
+```{r}
+# NOTE: provide the path to the folder that contains the CSV file
+d.occs <- 'C:/Users/munozferrandiz/Desktop/NETES' 
+# create path to user occurrences csv file
+userOccs.path <- file.path(d.occs, "GENTIANA_ALPINAfiltrada.csv")
+# read in csv
+userOccs.csv <- read.csv(userOccs.path, header = TRUE)
+# remove rows with duplicate coordinates
+occs.dups <- duplicated(userOccs.csv[c('longitude', 'latitude')])
+occs <- userOccs.csv[!occs.dups,]
+# remove NAs
+occs <- occs[complete.cases(occs$longitude, occs$latitude), ]
+# give all records a unique ID
+occs$occID <- row.names(occs)
+```
+
+### Obtain Environmental Data
+
+Using WorldClim
+(<a href="http://www.worldclim.org/" class="uri">http://www.worldclim.org/</a>)
+bioclimatic dataset at resolution of 2.5 arcmin.
+
+```{r}
+# NOTE: provide the path to the folder that contains the rasters
+d.envs1961_2000 <- 'D:/MODEL1961_2000/Biovars/mitjanes'
+
+
+# create paths to the raster files
+userRas.paths1961_2000 <- file.path(d.envs1961_2000, c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
+
+# make a RasterStack out of the raster files
+envs <- raster::stack(userRas.paths1961_2000)  
+# extract environmental values at occ grid cells
+locs.vals <- raster::extract(envs[[1]], occs[, c('longitude', 'latitude')])  
+
+#No entenc que locs.vals sigui un vector... pensava que seria una taula.
+
+# remove occs without environmental values
+occs <- occs[!is.na(locs.vals), ]  
+
+#occs1<-read.csv("C:/Users/munozferrandiz/Desktop/NETES/LATAULABIO.csv")
+
+```
+
+### Process Environmental Data
+
+Background selection technique chosen as .
+
+Read a .csv file and generate a Spatial Polygon object.
+
+```{r}
+# NOTE: provide the full path to the CSV file
+csvPath <- 'C:/Users/munozferrandiz/Desktop/NETES/AREA_ESTUDI.csv'
+# read csv with coordinates for polygon
+shp <- read.csv(csvPath, header = TRUE)
+bgExt <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(shp)), 1)))
+projection(bgExt)<-"+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+```
+
+Mask environmental variables by , and take a random sample of background
+values from the study extent. As the sample is random, your results may
+be different than those in the session. If there seems to be too much
+variability in these background samples, try increasing the number from
+10,000 to something higher (e.g. 50,000 or 100,000). The better your
+background sample, the less variability you’ll have between runs.
+
+Aquí és on haig de posar els background points per a què siguin per a totes les dècades! 50.000? Llegir!
+
+```{r}
+# crop the environmental rasters by the background extent shape
+envsBgCrop <- raster::crop(envs, bgExt)
+# mask the background extent shape from the cropped raster
+envsBgMsk <- raster::mask(envsBgCrop, bgExt)
+
+############### WALLACE METHOD (NOT IMPLEMENTED) ########################################################### 
+# sample random background points
+#bg.xy <- dismo::randomPoints(envsBgMsk, 10)  
+# convert matrix output to data frame
+bg.xy <- as.data.frame(bg.xy)
+
+############### OUR METHOD ########################################################### 
+vv = values (envsBgMsk)
+cellSamples = 1:nrow(vv)
+notNA =complete.cases(vv)
+cellSamples2 = cellSamples [notNA]
+bgCellId = sample (x = cellSamples2,size = 20000,replace = F)
+bg.xy = raster::xyFromCell(envsBgMsk,cell = bgCellId)
+bg.xy = as.data.frame (bg.xy)
+rm(vv)
+
+
+```
+
+### Partition Occurrence Data
+
+Occurrence data is now partitioned for cross-validation, a method that
+iteratively builds a model on all but one group and evaluates that model
+on the left-out group.
+
+For example, if the data is partitioned into 3 groups A, B, and C, a
+model is first built with groups A and B and is evaluated on C. This is
+repeated by building a model with B and C and evaluating on A, and so on
+until all combinations are done.
+
+Cross-validation operates under the assumption that the groups are
+independent of each other, which may or may not be a safe assumption for
+your dataset. Spatial partitioning is one way to ensure more
+independence between groups.
+
+You selected to partition your occurrence data by the method.
+
+SEPARAREM LES OBSERVACIONS PER DÈCADA A L'HORA DE FER LA PARTICIÓ? POTSER NO, NO?
+
+```{r}
+occs.xy <- occs[c('longitude', 'latitude')]
+group.data <- ENMeval::get.block(occ=occs.xy, bg.coords=bg.xy)
+```
+
+```{r}
+# pull out the occurrence and background partition group numbers from the list
+occs.grp <- group.data[[1]]
+bg.grp <- group.data[[2]]
+```
+
+### Build and Evaluate Niche Model
+
+You selected the maxent model.
+
+```{r}
+# define the vector of regularization multipliers to test
+rms <- seq(1, 2, 1)
+# iterate model building over all chosen parameter settings
+e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
+                          method = 'user', occs.grp, bg.grp, clamp = TRUE, algorithm = "maxnet")
+
+                                        #MAXENT O MAXNET?
+
+#save the model
+readr::write_rds (e, 'ENM_models.rds')
+
+#if you needed to reload the model
+e <- readr::read_rds (e, 'ENM_models.rds')
+
+#with javascript (NOT IMPLEMENTED)
+# ejar <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
+#                           method = 'user', occs.grp, bg.grp, clamp = TRUE, algorithm = "maxent.jar")
+
+# unpack the results data frame, the list of models, and the RasterStack of raw predictions
+evalTbl <- e@results
+evalMods <- e@models
+names(evalMods) <- e@results$settings
+evalPreds <- e@predictions
+```
+```
+
+```{r}
+# view response curves for environmental variables with non-zero coefficients
+dismo::response(evalMods[["L_1"]], var = c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
+```
+
+```{r}
+# view ENMeval results
+ENMeval::eval.plot(evalTbl, value = "avg.test.AUC")
+```
+
+```{r}
+# Select your model from the models list
+mod <- evalMods[["L_1"]]
+```
+
+```{r}
+# generate logistic prediction
+pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
+```
+
+```{r}
+# plot the model prediction
+plot(pred)
+```
+
+
+####################ALTRES TIPUS DE RESULTATS. 
+
+```{r}
+# Select your model from the models list
+mod <- evalMods[["L_3"]]
+```
+
+```{r}
+# generate cloglog prediction
+pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=cloglog")) 
+```
+
+```{r}
+# get predicted values for occurrence grid cells
+occPredVals <- raster::extract(pred, occs.xy)
+# define minimum training presence threshold
+thr <- thresh(occPredVals, "p10")
+# threshold model prediction
+pred <- pred > thr
+```
+
+```{r}
+# plot the model prediction
+plot(pred)
+```
+
+### Project Niche Model
+
+You selected to project your model. First define a polygon with the
+coordinates you chose, then crop and mask your predictor rasters.
+Finally, predict suitability values for these new raster cells based on
+the model you selected.
+
+```{r}
+projCoords <- data.frame(x = c(-0.8644, 2.6704, 2.6484, -0.7436, -1.0674, -0.8644), y = c(43.3867, 43.1747, 41.9203, 42.0142, 43.0263, 43.3867))
+projPoly <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(projCoords)), ID=1)))
+```
+
+### Project Niche Model to New Time
+
+Now download the future climate variables chosen with *Wallace*, crop
+and mask them by projPoly, and use the dismo::predict() function to
+predict the values for the new time based on the model selected.
+
+```{r}
+envsFuture <- raster::getData("CMIP5", var = "bio", res = 2.5, rcp = 45, model = "AC", year = 50)
+
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj <- raster::mask(predsProj, projPoly)
+
+# rename future climate variable names
+names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+# select climate variables
+predsProj <- raster::subset(predsProj, names(envs))
+```
+
+```{r}
+# predict model
+proj <- dismo::predict(mod, predsProj, args = c('outputformat=cloglog'))
+```
+
+```{r}
+# get predicted values for occurrence grid cells
+occPredVals <- raster::extract(pred, occs.xy)
+# define minimum training presence threshold
+thr <- thresh(occPredVals, "p10")
+# threshold model prediction
+proj <- proj > thr
+```
+
+```{r}
+# plot the model prediction
+plot(proj)
+```
+
+
+
+
