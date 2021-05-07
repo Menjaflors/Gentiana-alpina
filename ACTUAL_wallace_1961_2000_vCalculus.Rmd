@@ -43,8 +43,8 @@ current workspace, change to the correct file path
 (e.g. “/Users/darwin/Documents/occs.csv”).
 
 ```{r}
-# NOTE: provide the path to the folder that contains the CSV file
-d.occs <- 'D:/quercus/Projets/Gentiana_Alpina_David/ocs' 
+# NOTE: provide the path to the folder that contains the CSV file 
+d.occs <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs' 
 # create path to user occurrences csv file
 userOccs.path <- file.path(d.occs, "GENTIANA_ALPINAfiltrada.csv")
 # read in csv
@@ -81,7 +81,7 @@ bioclimatic dataset at resolution of 2.5 arcmin.
 
 ```{r}
 # NOTE: provide the path to the folder that contains the rasters
-d.envs1961_2000 <- 'D:/quercus/Projets/Gentiana_Alpina_David/Biovars/mitjanes'
+d.envs1961_2000 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/mitjanes'
 
 
 # create paths to the raster files
@@ -97,7 +97,6 @@ locs.vals <- raster::extract(envs[[1]], occs[, c('longitude', 'latitude')])
 # remove occs without environmental values
 occs <- occs[!is.na(locs.vals), ]  
 
-#occs1<-read.csv("C:/Users/munozferrandiz/Desktop/NETES/LATAULABIO.csv")
 
 ```
 
@@ -109,7 +108,7 @@ Read a .csv file and generate a Spatial Polygon object.
 
 ```{r}
 # NOTE: provide the full path to the CSV file
-csvPath <- 'D:/quercus/Projets/Gentiana_Alpina_David/ocs/AREA_ESTUDI.csv'
+csvPath <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/AREA_ESTUDI.csv'
 # read csv with coordinates for polygon
 shp <- read.csv(csvPath, header = TRUE)
 bgExt <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(shp)), 1)))
@@ -215,7 +214,7 @@ evalPreds <- e@predictions
 
 ```{r}
 # view response curves for environmental variables with non-zero coefficients
-dismo::response(evalMods[["L_1"]], var = c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
+#dismo::response(evalMods[["L_1"]], var = c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
 
 plot(evalMods[["L_1"]], vars = c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000'), type = "cloglog")
 
@@ -231,14 +230,14 @@ ENMeval::eval.plot(evalTbl, value = "avg.test.AUC")
 
 ```{r}
 # Select your model from the models list
-mod <- evalMods[["L_1"]]
+mod <- evalMods[["H_1"]]
 
 
 ```
 
 ```{r}
 # generate logistic prediction
-pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
+#pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
 pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)  
 #Aquesta última línia és de la última prova amb maxnet. 
 ```
