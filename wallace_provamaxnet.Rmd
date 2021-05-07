@@ -23,7 +23,6 @@ library(dismo)
 library(rgeos)
 library(ENMeval)
 library(dplyr)
-library (tidyverse)
 ```
 
 Wallace also includes several functions developed to help integrate
@@ -44,7 +43,7 @@ current workspace, change to the correct file path
 
 ```{r}
 # NOTE: provide the path to the folder that contains the CSV file
-d.occs <- 'D:/quercus/Projets/Gentiana_Alpina_David/ocs' 
+d.occs <- ''
 # create path to user occurrences csv file
 userOccs.path <- file.path(d.occs, "GENTIANA_ALPINAfiltrada.csv")
 # read in csv
@@ -58,96 +57,66 @@ occs <- occs[complete.cases(occs$longitude, occs$latitude), ]
 occs$occID <- row.names(occs)
 ```
 
-
-### Process Occurrence Data
-
-Spatial thinning selected. Thin distance selected is 0.1 km.
-
-```{r}
-output <- spThin::thin(occs, 'latitude', 'longitude', 'name', thin.par = 0.1, reps = 100, locs.thinned.list.return = TRUE, write.files = FALSE, verbose = FALSE)
-```
-
-Since spThin did 100 iterations, there are 100 different variations of
-how it thinned your occurrence localities. As there is a stochastic
-element in the algorithm, some iterations may include more localities
-than the others, and we need to make sure we maximize the number of
-localities we proceed with.
-
 ### Obtain Environmental Data
 
 Using WorldClim
 (<a href="http://www.worldclim.org/" class="uri">http://www.worldclim.org/</a>)
-bioclimatic dataset at resolution of 2.5 arcmin.
+bioclimatic dataset at resolution of 5 arcmin.
 
 ```{r}
-# NOTE: provide the path to the folder that contains the rasters
-d.envs1961_2000 <- 'D:/quercus/Projets/Gentiana_Alpina_David/Biovars/mitjanes'
-
-
-# create paths to the raster files
-userRas.paths1961_2000 <- file.path(d.envs1961_2000, c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
-
-# make a RasterStack out of the raster files
-envs <- raster::stack(userRas.paths1961_2000)  
+# get WorldClim bioclimatic variable rasters
+envs <- raster::getData(name = "worldclim", var = "bio", res = 5, lat = , lon = )
+# change names rasters variables
+envRes <- 5
+if (envRes == 0.5) {
+  i <- grep('_', names(envs))
+  editNames <- sapply(strsplit(names(envs)[i], '_'), function(x) x[1])
+  names(envs)[i] <- editNames
+}
+i <- grep('bio[0-9]$', names(envs))
+editNames <- paste('bio', sapply(strsplit(names(envs)[i], 'bio'), function(x) x[2]), sep='0')
+names(envs)[i] <- editNames
+# subset by those variables selected
+envs <- envs[[c('bio01', 'bio02', 'bio04', 'bio06', 'bio10', 'bio12', 'bio13')]]
 # extract environmental values at occ grid cells
-locs.vals <- raster::extract(envs[[1]], occs[, c('longitude', 'latitude')])  
-
-#No entenc que locs.vals sigui un vector... pensava que seria una taula.
-
+locs.vals <- raster::extract(envs[[1]], occs[, c('longitude', 'latitude')])
 # remove occs without environmental values
 occs <- occs[!is.na(locs.vals), ]  
-
-#occs1<-read.csv("C:/Users/munozferrandiz/Desktop/NETES/LATAULABIO.csv")
-
 ```
 
 ### Process Environmental Data
 
-Background selection technique chosen as .
-
-Read a .csv file and generate a Spatial Polygon object.
+Background selection technique chosen as Minimum Convex Polygon.
 
 ```{r}
-# NOTE: provide the full path to the CSV file
-csvPath <- 'D:/quercus/Projets/Gentiana_Alpina_David/ocs/AREA_ESTUDI.csv'
-# read csv with coordinates for polygon
-shp <- read.csv(csvPath, header = TRUE)
-bgExt <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(shp)), 1)))
-projection(bgExt)<-"+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+occs.xy <- occs[c('longitude', 'latitude')]
+sp::coordinates(occs.xy) <- ~ longitude + latitude
+bgExt <- mcp(occs.xy)
 ```
 
-Mask environmental variables by , and take a random sample of background
-values from the study extent. As the sample is random, your results may
-be different than those in the session. If there seems to be too much
-variability in these background samples, try increasing the number from
-10,000 to something higher (e.g. 50,000 or 100,000). The better your
-background sample, the less variability you’ll have between runs.
+Buffer size of the study extent polygon defined as 0.5 degrees.
 
-Aquí és on haig de posar els background points per a què siguin per a totes les dècades! 50.000? Llegir!
+```{r}
+bgExt <- rgeos::gBuffer(bgExt, width = 0.5)
+```
+
+Mask environmental variables by Minimum Convex Polygon, and take a
+random sample of background values from the study extent. As the sample
+is random, your results may be different than those in the session. If
+there seems to be too much variability in these background samples, try
+increasing the number from 10,000 to something higher (e.g. 50,000 or
+100,000). The better your background sample, the less variability you’ll
+have between runs.
 
 ```{r}
 # crop the environmental rasters by the background extent shape
 envsBgCrop <- raster::crop(envs, bgExt)
 # mask the background extent shape from the cropped raster
 envsBgMsk <- raster::mask(envsBgCrop, bgExt)
-
-############### WALLACE METHOD (NOT IMPLEMENTED) ########################################################### 
 # sample random background points
-#bg.xy <- dismo::randomPoints(envsBgMsk, 10)  
+bg.xy <- dismo::randomPoints(envsBgMsk, 100)
 # convert matrix output to data frame
-#bg.xy <- as.data.frame(bg.xy)
-
-############### OUR METHOD ########################################################### 
-vv = values (envsBgMsk)
-cellSamples = 1:nrow(vv)
-notNA =complete.cases(vv)
-cellSamples2 = cellSamples [notNA]
-bgCellId = sample (x = cellSamples2,size = 20000,replace = F)
-bg.xy = raster::xyFromCell(envsBgMsk,cell = bgCellId)
-bg.xy = as.data.frame (bg.xy)
-rm(vv)
-
-
+bg.xy <- as.data.frame(bg.xy)  
 ```
 
 ### Partition Occurrence Data
@@ -168,8 +137,6 @@ independence between groups.
 
 You selected to partition your occurrence data by the method.
 
-SEPARAREM LES OBSERVACIONS PER DÈCADA A L'HORA DE FER LA PARTICIÓ? POTSER NO, NO?
-
 ```{r}
 occs.xy <- occs[c('longitude', 'latitude')]
 group.data <- ENMeval::get.block(occ=occs.xy, bg.coords=bg.xy)
@@ -187,23 +154,10 @@ You selected the maxent model.
 
 ```{r}
 # define the vector of regularization multipliers to test
-rms <- seq(1, 4, 1)
+rms <- seq(1, 2, 1)
 # iterate model building over all chosen parameter settings
-e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
+e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = 'L', 
                           method = 'user', occs.grp, bg.grp, clamp = TRUE, algorithm = "maxnet")
-
-#A dalt està posat Maxnet, ja es el que toca o hem de canviar a maxent? Maxent triga molt menys
-
-#save the model
-readr::write_rds (e, 'ENM_models.rds')
-
-#if you needed to reload the model
-#e <- readr::read_rds (e, 'ENM_models.rds')             
-#e <- readr::read_rds (file='ENM_models.rds')
-
-#with javascript (NOT IMPLEMENTED)
-# ejar <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
-#                           method = 'user', occs.grp, bg.grp, clamp = TRUE, algorithm = "maxent.jar")
 
 # unpack the results data frame, the list of models, and the RasterStack of raw predictions
 evalTbl <- e@results
@@ -211,36 +165,25 @@ evalMods <- e@models
 names(evalMods) <- e@results$settings
 evalPreds <- e@predictions
 ```
-```
 
 ```{r}
 # view response curves for environmental variables with non-zero coefficients
-dismo::response(evalMods[["L_1"]], var = c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
-
-plot(evalMods[["L_1"]], vars = c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000'), type = "cloglog")
-
-#AFEGIDA AQUESTA LÍNIA DE DALT. 
-
+plot(evalMods[["L_1"]], vars = c('bio01', 'bio02', 'bio04', 'bio06', 'bio12', 'bio13'), type = "cloglog")
 ```
 
 ```{r}
 # view ENMeval results
 ENMeval::eval.plot(evalTbl, value = "avg.test.AUC")
-
 ```
 
 ```{r}
 # Select your model from the models list
 mod <- evalMods[["L_1"]]
-
-
 ```
 
 ```{r}
 # generate logistic prediction
-pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
-pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)  
-#Aquesta última línia és de la última prova amb maxnet. 
+pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)
 ```
 
 ```{r}
@@ -248,8 +191,7 @@ pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp =
 plot(pred)
 ```
 
-
-### Project Niche Model. Aquí hauré de canviar mil coses. 
+### Project Niche Model
 
 You selected to project your model. First define a polygon with the
 coordinates you chose, then crop and mask your predictor rasters.
