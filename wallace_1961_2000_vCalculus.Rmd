@@ -172,7 +172,7 @@ You selected the maxent model.
 
 ```{r}
 # define the vector of regularization multipliers to test
-rms <- seq(1, 2, 1)
+rms <- seq(1, 4, 1)
 # iterate model building over all chosen parameter settings
 e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
                           method = 'user', occs.grp, bg.grp, clamp = TRUE, algorithm = "maxnet")
