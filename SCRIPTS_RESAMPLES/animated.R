@@ -77,7 +77,7 @@ rcp85<-stack(entrada1, entrada2, entrada3, entrada4, entrada5, entrada6, entrada
 main<-c("1961_1970", "1971_1980", "1981_1990", "1991_2000", "2001_2010", "2011_2020", "2021_2030", "2031_2040",
         "2041_2050", "2051_2060","2061_2070", "2071_2080", "2081_2090", "2091_2100")
 
-animate(x=rcp85, main=main, pause=0.4, maxpixels=100000, n=3, col=terrain.colors(600))
+animate(x=rcp85, main=main, pause=0.4, maxpixels=100000, n=1, col=terrain.colors(600))
 
 animate(x=rcp45, main=main, pause=0.4, maxpixels=100000, n=3, col=terrain.colors(600))
 
