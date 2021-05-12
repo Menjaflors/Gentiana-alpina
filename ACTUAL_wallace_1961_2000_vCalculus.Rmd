@@ -64,7 +64,7 @@ occs$occID <- row.names(occs)
 Spatial thinning selected. Thin distance selected is 0.1 km.
 
 ```{r}
-output <- spThin::thin(occs, 'latitude', 'longitude', 'name', thin.par = 0.1, reps = 100, locs.thinned.list.return = TRUE, write.files = FALSE, verbose = FALSE)
+#output <- spThin::thin(occs, 'latitude', 'longitude', 'name', thin.par = 0.1, reps = 100, locs.thinned.list.return = TRUE, write.files = FALSE, verbose = FALSE)
 ```
 
 Since spThin did 100 iterations, there are 100 different variations of
