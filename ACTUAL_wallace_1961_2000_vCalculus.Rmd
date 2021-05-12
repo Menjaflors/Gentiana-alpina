@@ -318,7 +318,7 @@ to predict the values for the new time based on the model selected.
 
 
 
-d.envs2021_2030 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/2021_2030'
+d.envs2021_2030 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2021_2030'
 # create paths to the raster files
 userRas.paths2021_2030 <- file.path(d.envs2021_2030, c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
 # make a RasterStack out of the raster files
@@ -331,6 +331,18 @@ names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_
 # select climate variables
 # predsProj <- raster::subset(predsProj, names(envs))
 
+
+
+d.envs2091_2100 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2091_2100'
+# create paths to the raster files
+userRas.paths2091_2100 <- file.path(d.envs2091_2100, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2091_2100)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
 
 ```
 
