@@ -236,8 +236,8 @@ e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms,
 readr::write_rds (e, 'ENM_models2.rds')
 
 #if you needed to reload the model
-#e <- readr::read_rds (e, 'ENM_models.rds')             
-#e <- readr::read_rds (file='ENM_models.rds')
+
+e <- readr::read_rds ("D:/Users/munozferrandiz/Documents/MODEL1961_2000/ENM_models.rds")
 
 #with javascript (NOT IMPLEMENTED)
 # ejar <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
