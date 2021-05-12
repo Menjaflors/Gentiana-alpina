@@ -92,8 +92,6 @@ envs <- raster::stack(userRas.paths1961_2000)
 # extract environmental values at occ grid cells
 locs.vals <- raster::extract(envs[[1]], occs[, c('longitude', 'latitude')])  
 
-#No entenc que locs.vals sigui un vector... pensava que seria una taula.
-
 # remove occs without environmental values
 occs <- occs[!is.na(locs.vals), ]  
 
@@ -121,26 +119,6 @@ be different than those in the session. If there seems to be too much
 variability in these background samples, try increasing the number from
 10,000 to something higher (e.g. 50,000 or 100,000). The better your
 background sample, the less variability you’ll have between runs.
-
-Aquí és on haig de posar els background points per a què siguin per a totes les dècades! 50.000? Llegir!
-
-```{r}
-# NOTE: provide the full path to the CSV file
-csvPath <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/AREA_ESTUDIKK.csv'
-# read csv with coordinates for polygon
-shp <- read.csv(csvPath, header = TRUE)
-bgExt <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(shp)), 1)))
-projection(bgExt)<-"+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
-```
-
-Mask environmental variables by , and take a random sample of background
-values from the study extent. As the sample is random, your results may
-be different than those in the session. If there seems to be too much
-variability in these background samples, try increasing the number from
-10,000 to something higher (e.g. 50,000 or 100,000). The better your
-background sample, the less variability you’ll have between runs.
-
-Aquí és on haig de posar els background points per a què siguin per a totes les dècades! 50.000? Llegir!
 
 ```{r}
 # crop the environmental rasters by the background extent shape
