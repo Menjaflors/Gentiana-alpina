@@ -125,11 +125,43 @@ background sample, the less variability you’ll have between runs.
 Aquí és on haig de posar els background points per a què siguin per a totes les dècades! 50.000? Llegir!
 
 ```{r}
+# NOTE: provide the full path to the CSV file
+csvPath <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/AREA_ESTUDIKK.csv'
+# read csv with coordinates for polygon
+shp <- read.csv(csvPath, header = TRUE)
+bgExt <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(shp)), 1)))
+projection(bgExt)<-"+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+```
+
+Mask environmental variables by , and take a random sample of background
+values from the study extent. As the sample is random, your results may
+be different than those in the session. If there seems to be too much
+variability in these background samples, try increasing the number from
+10,000 to something higher (e.g. 50,000 or 100,000). The better your
+background sample, the less variability you’ll have between runs.
+
+Aquí és on haig de posar els background points per a què siguin per a totes les dècades! 50.000? Llegir!
+
+```{r}
 # crop the environmental rasters by the background extent shape
+obrir1<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster.tif")
+obrir2<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster1.tif")
+obrir3<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster2.tif")
+obrir4<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster3.tif")
+obrir5<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster4.tif")
+obrir6<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster5.tif")
+obrir7<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster6.tif")
+obrir8<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster7.tif")
+
+obrir<-stack(obrir1, obrir2, obrir3, obrir4, obrir5, obrir6, obrir7, obrir8)
+
+
+
 envsBgCrop <- raster::crop(envs, bgExt)
+envsBgCrop1<- raster::crop(obrir, bgExt)
 # mask the background extent shape from the cropped raster
 envsBgMsk <- raster::mask(envsBgCrop, bgExt)
-
+envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
 ############### WALLACE METHOD (NOT IMPLEMENTED) ########################################################### 
 # sample random background points
 #bg.xy <- dismo::randomPoints(envsBgMsk, 10)  
@@ -137,14 +169,21 @@ envsBgMsk <- raster::mask(envsBgCrop, bgExt)
 #bg.xy <- as.data.frame(bg.xy)
 
 ############### OUR METHOD ########################################################### 
+
+valors<-values(envsBgMsk1)
+cellSamples1 = 1:nrow(valors)
+NoNA =complete.cases(valors)
+cellSamples3 = cellSamples1 [NoNA]
+
 vv = values (envsBgMsk)
 cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
-cellSamples2 = cellSamples [notNA]
-bgCellId = sample (x = cellSamples2,size = 20000,replace = F)
+cellSamples2 = cellSamples [notNA]    #L'objectiu és tenir un objecte igual que cellsamples2. 
+bgCellId = sample (x = cellSamples2,size = 100000,replace = F, prob = cellSamples3)
 bg.xy = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy = as.data.frame (bg.xy)
 rm(vv)
+
 
 
 ```
@@ -188,13 +227,13 @@ You selected the maxent model.
 # define the vector of regularization multipliers to test
 rms <- seq(1, 4, 1)
 # iterate model building over all chosen parameter settings
-e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
-                          method = 'user', occs.grp, bg.grp, clamp = TRUE, algorithm = "maxnet")
+e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ'), 
+                          method = 'user', occs.grp, bg.grp, n.bg = 100000, clamp = TRUE, algorithm = "maxnet")
 
 #A dalt està posat Maxnet, ja es el que toca o hem de canviar a maxent? Maxent triga molt menys
 
 #save the model
-readr::write_rds (e, 'ENM_models.rds')
+readr::write_rds (e, 'ENM_models2.rds')
 
 #if you needed to reload the model
 #e <- readr::read_rds (e, 'ENM_models.rds')             
@@ -218,28 +257,30 @@ evalPreds <- e@predictions
 
 plot(evalMods[["L_1"]], vars = c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000'), type = "cloglog")
 
-#AFEGIDA AQUESTA LÍNIA DE DALT. 
 
 ```
 
 ```{r}
+
 # view ENMeval results
 ENMeval::eval.plot(evalTbl, value = "avg.test.AUC")
 
 ```
 
 ```{r}
+
 # Select your model from the models list
-mod <- evalMods[["H_1"]]
+mod <- evalMods[["LQ_1"]]
 
 
 ```
 
 ```{r}
+
 # generate logistic prediction
 #pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
 pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)  
-#Aquesta última línia és de la última prova amb maxnet. 
+
 ```
 
 ```{r}
@@ -256,8 +297,13 @@ Finally, predict suitability values for these new raster cells based on
 the model you selected.
 
 ```{r}
-projCoords <- data.frame(x = c(-0.4999, 1.1577, 2.0743, 0.1697, -0.4999), y = c(43.7417, 42.9146, 43.6703, 43.8052, 43.7417))
-projPoly <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(projCoords)), ID=1)))
+
+#projCoords <- data.frame(x = c(-0.4999, 1.1577, 2.0743, 0.1697, -0.4999), y = c(43.7417, 42.9146, 43.6703, 43.8052, 43.7417))
+#projPoly <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(projCoords)), ID=1)))
+
+projPoly <- bgExt
+projection(bgExt)<-"+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+
 ```
 
 ### Project Niche Model to New Time
@@ -267,23 +313,40 @@ and mask them by projPoly, and use the maxnet.predictRaster() function
 to predict the values for the new time based on the model selected.
 
 ```{r}
-envsFuture <- raster::getData("CMIP5", var = "bio", res = 5, rcp = 85, model = "MR", year = 50)
 
+#envsFuture <- raster::getData("CMIP5", var = "bio", res = 5, rcp = 85, model = "MR", year = 50)
+
+
+
+d.envs2021_2030 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/2021_2030'
+# create paths to the raster files
+userRas.paths2021_2030 <- file.path(d.envs2021_2030, c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2021_2030)  
 predsProj <- raster::crop(envsFuture, projPoly)
 predsProj <- raster::mask(predsProj, projPoly)
-
 # rename future climate variable names
-names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
 # select climate variables
-predsProj <- raster::subset(predsProj, names(envs))
+# predsProj <- raster::subset(predsProj, names(envs))
+
+
 ```
 
 ```{r}
+
 # predict model
+
 proj <- ENMeval::maxnet.predictRaster(mod, predsProj, type = 'logistic', clamp = TRUE)
+writeraster(proj, "./projeccioprova")
+
 ```
 
 ```{r}
+
 # plot the model prediction
 plot(proj)
+writeRaster(proj, "./projeccioprova.tif")
 ```
+
