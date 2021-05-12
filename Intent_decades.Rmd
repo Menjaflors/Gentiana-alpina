@@ -153,9 +153,6 @@ cellSamples1 = 1:nrow(valors)
 NoNA =complete.cases(valors)
 cellSamples3 = cellSamples1 [NoNA]
 
-cellSampProb = values (obrir1)
-cellSampProb2 = cellSampProb[notNA]
-
 vv = values (envsBgMsk)
 cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
