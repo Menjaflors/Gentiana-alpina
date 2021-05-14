@@ -56,10 +56,10 @@ userOccs.path6 <- file.path(d.occs, "2011_2020_KK.csv")
 # read in csv
 userOccs1.csv <- read.csv(userOccs.path1, header = T)
 userOccs2.csv <- read.csv(userOccs.path2, header = T)
-userOccs3.csv <- read.csv(userOccs.path3)
-userOccs4.csv <- read.csv(userOccs.path4)
-userOccs5.csv <- read.csv(userOccs.path5)
-userOccs6.csv <- read.csv(userOccs.path6)
+userOccs3.csv <- read.csv(userOccs.path3, header = T)
+userOccs4.csv <- read.csv(userOccs.path4, header = T)
+userOccs5.csv <- read.csv(userOccs.path5, header = T)
+userOccs6.csv <- read.csv(userOccs.path6, header = T)
 # remove rows with duplicate coordinates
 occs.dups1 <- duplicated(userOccs1.csv[c('longitude', 'latitude')])
 occs.dups2 <- duplicated(userOccs2.csv[c('longitude', 'latitude')])
@@ -125,6 +125,16 @@ d.envs2010_2020 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades
 # create paths to the raster files
 userRas.paths1961_1970 <- file.path(d.envs1961_1970, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
 
+userRas.paths1971_1980 <- file.path(d.envs1971_1980, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+
+userRas.paths1981_1990 <- file.path(d.envs1981_1990, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+
+userRas.paths1991_2000 <- file.path(d.envs1991_2000, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+
+userRas.paths2001_2010 <- file.path(d.envs2001_2010, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+
+userRas.paths2011_2020 <- file.path(d.envs2011_2020, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+
 # make a RasterStack out of the raster files
 envs1 <- raster::stack(userRas.paths1961_1970)
 envs2 <- raster::stack(userRas.paths1971_1980)  
@@ -146,7 +156,7 @@ occs3 <- occs3[!is.na(locs.vals3), ]
 occs4 <- occs4[!is.na(locs.vals4), ]  
 occs5 <- occs5[!is.na(locs.vals5), ]  
 occs6 <- occs6[!is.na(locs.vals6), ]  
-
+occs  <-rbind(occs1, occs2, occs3, occs4, occs5, occs6)
 
 ```
 
@@ -174,7 +184,23 @@ background sample, the less variability you’ll have between runs.
 
 ```{r}
 # crop the environmental rasters by the background extent shape
-obrir1<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster.tif")
+obrir11<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1961_1970_1.tif")
+obrir12<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1971_1980_1.tif")
+obrir13<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1981_1990_1.tif")
+obrir14<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1991_2000_1.tif")
+obrir15<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2001_2010_1.tif")
+obrir16<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2011_2020_1.tif")
+
+
+
+obrir51<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1961_1970_5.tif")
+obrir52<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1971_1980_5.tif")
+obrir53<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1981_1990_5.tif")
+obrir54<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1991_2000_5.tif")
+obrir55<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2001_2010_5.tif")
+obrir56<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2011_2020_5.tif")
+
+
 envsBgCrop1 <- raster::crop(envs1, bgExt)
 envsBgCrop2 <- raster::crop(envs2, bgExt)
 envsBgCrop3 <- raster::crop(envs3, bgExt)
@@ -207,7 +233,7 @@ cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
 cellSamples2 = cellSamples [notNA] 
 
-cellSampProb = values (obrir1)
+cellSampProb = values (obrir11)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
@@ -224,7 +250,7 @@ cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
 cellSamples2 = cellSamples [notNA] 
 
-cellSampProb = values (obrir1)
+cellSampProb = values (obrir12)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
@@ -240,7 +266,7 @@ cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
 cellSamples2 = cellSamples [notNA] 
 
-cellSampProb = values (obrir1)
+cellSampProb = values (obrir13)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
@@ -256,7 +282,7 @@ cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
 cellSamples2 = cellSamples [notNA] 
 
-cellSampProb = values (obrir1)
+cellSampProb = values (obrir14)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
@@ -272,7 +298,7 @@ cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
 cellSamples2 = cellSamples [notNA] 
 
-cellSampProb = values (obrir1)
+cellSampProb = values (obrir15)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
@@ -288,7 +314,7 @@ cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
 cellSamples2 = cellSamples [notNA] 
 
-cellSampProb = values (obrir1)
+cellSampProb = values (obrir16)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
@@ -443,6 +469,78 @@ predsProj <- raster::mask(predsProj, projPoly)
 names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
 # select climate variables
 # predsProj <- raster::subset(predsProj, names(envs))
+
+
+d.envs2031_2040 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2031_2040'
+# create paths to the raster files
+userRas.paths2031_2040 <- file.path(d.envs2031_2040, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2031_2040)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
+
+
+d.envs2041_050 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2041_2050'
+# create paths to the raster files
+userRas.paths2041_2050 <- file.path(d.envs2041_2050, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2041_2050)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
+
+
+d.envs2051_2060 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2051_2060'
+# create paths to the raster files
+userRas.paths2051_2060 <- file.path(d.envs2051_2060, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2051_2060)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
+
+
+d.envs2061_2070 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2061_2070'
+# create paths to the raster files
+userRas.paths2061_2070 <- file.path(d.envs2061_2070, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2061_2070)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
+
+
+d.envs2071_2080 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2071_2080'
+# create paths to the raster files
+userRas.paths2071_2080 <- file.path(d.envs2071_2080, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2071_2080)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
+
+
+d.envs2081_2090 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2081_2090'
+# create paths to the raster files
+userRas.paths2091_2100 <- file.path(d.envs2081_2090, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2081_2090)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj) <- c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000')
 
 
 

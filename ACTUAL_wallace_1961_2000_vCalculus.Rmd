@@ -123,24 +123,40 @@ background sample, the less variability you’ll have between runs.
 
 ```{r}
 # crop the environmental rasters by the background extent shape
-obrir1<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster.tif")
-obrir2<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster1.tif")
-obrir3<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster2.tif")
-obrir4<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster3.tif")
-obrir5<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster4.tif")
-obrir6<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster5.tif")
-obrir7<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster6.tif")
-obrir8<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster7.tif")
+#obrir0<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_5.tif")
+#obrir2<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_5.tif")
+#obrir3<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_5.tif")
+#obrir4<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_5.tif")
+#obrir5<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_5.tif")
+#obrir6<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_5.tif")
+#obrir7<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_5.tif")
+#obrir8<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_5.tif")
 
-obrir<-stack(obrir1, obrir2, obrir3, obrir4, obrir5, obrir6, obrir7, obrir8)
 
+obrir11<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_1.tif")
+#obrir21<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_1.tif")
+#obrir31<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_1.tif")
+#obrir41<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_1.tif")
+#obrir51<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_1.tif")
+#obrir61<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_1.tif")
+#obrir71<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_1.tif")
+#obrir81<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/Provaraster1961_2020_1.tif")
+
+
+#obrir1<-stack(obrir1, obrir2, obrir3, obrir4, obrir5, obrir6, obrir7, obrir8)
+obrir2<-stack(obrir11, obrir21, obrir31, obrir41, obrir51, obrir61, obrir71, obrir81)
 
 
 envsBgCrop <- raster::crop(envs, bgExt)
-envsBgCrop1<- raster::crop(obrir, bgExt)
+#envsBgCrop1<- raster::crop(obrir1, bgExt)
+#envsBgCrop2<- raster::crop(obrir2, bgExt)
+
 # mask the background extent shape from the cropped raster
+
 envsBgMsk <- raster::mask(envsBgCrop, bgExt)
-envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
+#envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
+#envsBgMsk2 <- raster::mask(envsBgCrop2, bgExt)
+
 ############### WALLACE METHOD (NOT IMPLEMENTED) ########################################################### 
 # sample random background points
 #bg.xy <- dismo::randomPoints(envsBgMsk, 10)  
@@ -149,25 +165,19 @@ envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
 
 ############### OUR METHOD ########################################################### 
 
-#valors<-values(envsBgMsk1)
-#cellSamples1 = 1:nrow(valors)
-#NoNA =complete.cases(valors)
-#cellSamples3 = cellSamples1 [NoNA]
 
 vv = values (envsBgMsk)
 cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
 cellSamples2 = cellSamples [notNA] 
 
-cellSampProb = values (obrir1)
-cellSampProb2 = cellSampProb[notNA]
+cellSampProb = values (obrir11)
+cellSampProb2 <- cellSampProb[notNA]
 
-   #L'objectiu és tenir un objecte igual que cellsamples2. 
 bgCellId = sample (x = cellSamples2,size = 100000,replace = F, prob = cellSampProb2)
 bg.xy = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy = as.data.frame (bg.xy)
 rm(vv)
-
 
 
 ```
@@ -217,7 +227,7 @@ e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms,
 #A dalt està posat Maxnet, ja es el que toca o hem de canviar a maxent? Maxent triga molt menys
 
 #save the model
-readr::write_rds (e, 'ENM_modelprobabilitat.rds')
+readr::write_rds (e, 'D:/Users/munozferrandiz/Documents/MODEL1961_2000/RESULTATS/ENM_modelprobabilitat1.rds')
 
 #if you needed to reload the model
 
@@ -264,7 +274,7 @@ mod <- evalMods[["LQ_1"]]
 # generate logistic prediction
 #pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
 pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)  
-#writeRaster(pred, "prediccioprob5.tif")
+writeRaster(pred, 'D:/Users/munozferrandiz/Documents/MODEL1961_2000/RESULTATS/ENM_modelprobabilitat1.TIF')
 
 ```
 
