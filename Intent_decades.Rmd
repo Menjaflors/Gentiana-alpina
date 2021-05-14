@@ -24,6 +24,7 @@ library(rgeos)
 library(ENMeval)
 library(dplyr)
 library (tidyverse)
+library(raster)
 ```
 
 Wallace also includes several functions developed to help integrate
@@ -44,18 +45,51 @@ current workspace, change to the correct file path
 
 ```{r}
 # NOTE: provide the path to the folder that contains the CSV file 
-d.occs <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs' 
+d.occs <- 'C:/Users/munozferrandiz/Desktop/NETES/Decades' 
 # create path to user occurrences csv file
-userOccs.path <- file.path(d.occs, "GENTIANA_ALPINAfiltrada.csv")
+userOccs.path1 <- file.path(d.occs, "1961_1970_KK.csv")
+userOccs.path2 <- file.path(d.occs, "1971_1980_KK.csv")
+userOccs.path3 <- file.path(d.occs, "1981_1990_KK.csv")
+userOccs.path4 <- file.path(d.occs, "1991_2000_KK.csv")
+userOccs.path5 <- file.path(d.occs, "2001_2010_KK.csv")
+userOccs.path6 <- file.path(d.occs, "2011_2020_KK.csv")
 # read in csv
-userOccs.csv <- read.csv(userOccs.path, header = TRUE)
+userOccs1.csv <- read.csv(userOccs.path1, header = T)
+userOccs2.csv <- read.csv(userOccs.path2, header = T)
+userOccs3.csv <- read.csv(userOccs.path3)
+userOccs4.csv <- read.csv(userOccs.path4)
+userOccs5.csv <- read.csv(userOccs.path5)
+userOccs6.csv <- read.csv(userOccs.path6)
 # remove rows with duplicate coordinates
-occs.dups <- duplicated(userOccs.csv[c('longitude', 'latitude')])
-occs <- userOccs.csv[!occs.dups,]
+occs.dups1 <- duplicated(userOccs1.csv[c('longitude', 'latitude')])
+occs.dups2 <- duplicated(userOccs2.csv[c('longitude', 'latitude')])
+occs.dups3 <- duplicated(userOccs3.csv[c('longitude', 'latitude')])
+occs.dups4 <- duplicated(userOccs4.csv[c('longitude', 'latitude')])
+occs.dups5 <- duplicated(userOccs5.csv[c('longitude', 'latitude')])
+occs.dups6 <- duplicated(userOccs6.csv[c('longitude', 'latitude')])
+occs1 <- userOccs1.csv[!occs.dups1,]
+occs2 <- userOccs2.csv[!occs.dups2,]
+occs3 <- userOccs3.csv[!occs.dups3,]
+occs4 <- userOccs4.csv[!occs.dups4,]
+occs5 <- userOccs5.csv[!occs.dups5,]
+occs6 <- userOccs6.csv[!occs.dups6,]
 # remove NAs
-occs <- occs[complete.cases(occs$longitude, occs$latitude), ]
+occs1 <- occs1[complete.cases(occs1$longitude, occs1$latitude), ]
+occs2 <- occs2[complete.cases(occs2$longitude, occs2$latitude), ]
+occs3 <- occs3[complete.cases(occs3$longitude, occs3$latitude), ]
+occs4 <- occs4[complete.cases(occs4$longitude, occs4$latitude), ]
+occs5 <- occs5[complete.cases(occs5$longitude, occs5$latitude), ]
+occs6 <- occs6[complete.cases(occs6$longitude, occs6$latitude), ]
+####AJUNTAR LES OBSERVACIONS EN UN SOL OBJECTE, NO? Tot i que al final és el mateix que pujar-ho junt. 
+occstotal<-rbind(occs1, occs2, occs3, occs4, occs5, occs6)
 # give all records a unique ID
-occs$occID <- row.names(occs)
+occstotal$occID <- row.names(occstotal)
+occs1$occID <- row.names(occs1)
+occs2$occID <- row.names(occs2)
+occs3$occID <- row.names(occs3)
+occs4$occID <- row.names(occs4)
+occs5$occID <- row.names(occs5)
+occs6$occID <- row.names(occs6)
 ```
 
 
@@ -81,19 +115,37 @@ bioclimatic dataset at resolution of 2.5 arcmin.
 
 ```{r}
 # NOTE: provide the path to the folder that contains the rasters
-d.envs1961_2000 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/mitjanes'
-
+d.envs1961_1970 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/1961_1970'
+d.envs1971_1980 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/1971_1980'
+d.envs1981_1990 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/1981_1990'
+d.envs1991_2000 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/1991_2000'
+d.envs2001_2010 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/2001_2010'
+d.envs2010_2020 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/2010_2020'
 
 # create paths to the raster files
-userRas.paths1961_2000 <- file.path(d.envs1961_2000, c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
+userRas.paths1961_1970 <- file.path(d.envs1961_1970, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
 
 # make a RasterStack out of the raster files
-envs <- raster::stack(userRas.paths1961_2000)  
+envs1 <- raster::stack(userRas.paths1961_1970)
+envs2 <- raster::stack(userRas.paths1971_1980)  
+envs3 <- raster::stack(userRas.paths1981_1990)  
+envs4 <- raster::stack(userRas.paths1991_2000)  
+envs5 <- raster::stack(userRas.paths2001_2010)  
+envs6 <- raster::stack(userRas.paths2011_2020)  
 # extract environmental values at occ grid cells
-locs.vals <- raster::extract(envs[[1]], occs[, c('longitude', 'latitude')])  
-
+locs.vals1 <- raster::extract(envs1[[1]], occs1[, c('longitude', 'latitude')])  
+locs.vals2 <- raster::extract(envs2[[1]], occs2[, c('longitude', 'latitude')])  
+locs.vals3 <- raster::extract(envs3[[1]], occs3[, c('longitude', 'latitude')])  
+locs.vals4 <- raster::extract(envs4[[1]], occs4[, c('longitude', 'latitude')])  
+locs.vals5 <- raster::extract(envs5[[1]], occs5[, c('longitude', 'latitude')])  
+locs.vals6 <- raster::extract(envs6[[1]], occs6[, c('longitude', 'latitude')])  
 # remove occs without environmental values
-occs <- occs[!is.na(locs.vals), ]  
+occs1 <- occs1[!is.na(locs.vals1), ]  
+occs2 <- occs2[!is.na(locs.vals2), ]  
+occs3 <- occs3[!is.na(locs.vals3), ]  
+occs4 <- occs4[!is.na(locs.vals4), ]  
+occs5 <- occs5[!is.na(locs.vals5), ]  
+occs6 <- occs6[!is.na(locs.vals6), ]  
 
 
 ```
@@ -123,23 +175,20 @@ background sample, the less variability you’ll have between runs.
 ```{r}
 # crop the environmental rasters by the background extent shape
 obrir1<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster.tif")
-obrir2<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster1.tif")
-obrir3<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster2.tif")
-obrir4<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster3.tif")
-obrir5<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster4.tif")
-obrir6<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster5.tif")
-obrir7<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster6.tif")
-obrir8<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/provaraster7.tif")
-
-obrir<-stack(obrir1, obrir2, obrir3, obrir4, obrir5, obrir6, obrir7, obrir8)
-
-
-
-envsBgCrop <- raster::crop(envs, bgExt)
-envsBgCrop1<- raster::crop(obrir, bgExt)
+envsBgCrop1 <- raster::crop(envs1, bgExt)
+envsBgCrop2 <- raster::crop(envs2, bgExt)
+envsBgCrop3 <- raster::crop(envs3, bgExt)
+envsBgCrop4 <- raster::crop(envs4, bgExt)
+envsBgCrop5 <- raster::crop(envs5, bgExt)
+envsBgCrop6 <- raster::crop(envs6, bgExt)
 # mask the background extent shape from the cropped raster
-envsBgMsk <- raster::mask(envsBgCrop, bgExt)
 envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
+envsBgMsk2 <- raster::mask(envsBgCrop2, bgExt)
+envsBgMsk3 <- raster::mask(envsBgCrop3, bgExt)
+envsBgMsk4 <- raster::mask(envsBgCrop4, bgExt)
+envsBgMsk5 <- raster::mask(envsBgCrop5, bgExt)
+envsBgMsk6 <- raster::mask(envsBgCrop6, bgExt)
+
 ############### WALLACE METHOD (NOT IMPLEMENTED) ########################################################### 
 # sample random background points
 #bg.xy <- dismo::randomPoints(envsBgMsk, 10)  
@@ -148,22 +197,107 @@ envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
 
 ############### OUR METHOD ########################################################### 
 
-valors<-values(envsBgMsk1)
-cellSamples1 = 1:nrow(valors)
-NoNA =complete.cases(valors)
-cellSamples3 = cellSamples1 [NoNA]
+#valors<-values(envsBgMsk1)
+#cellSamples1 = 1:nrow(valors)
+#NoNA =complete.cases(valors)
+#cellSamples3 = cellSamples1 [NoNA]
 
-vv = values (envsBgMsk)
+vv = values (envsBgMsk1)
 cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
-cellSamples2 = cellSamples [notNA]    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 100000,replace = F, prob = cellSamples3)
-bg.xy = raster::xyFromCell(envsBgMsk,cell = bgCellId)
-bg.xy = as.data.frame (bg.xy)
+cellSamples2 = cellSamples [notNA] 
+
+cellSampProb = values (obrir1)
+cellSampProb2 = cellSampProb[notNA]
+
+   #L'objectiu és tenir un objecte igual que cellsamples2. 
+bgCellId = sample (x = cellSamples2,size = 2624, replace = F, prob = cellSampProb2)
+bg.xy1 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
+bg.xy1 = as.data.frame (bg.xy)
 rm(vv)
 
 
+############################################
 
+vv = values (envsBgMsk2)
+cellSamples = 1:nrow(vv)
+notNA =complete.cases(vv)
+cellSamples2 = cellSamples [notNA] 
+
+cellSampProb = values (obrir1)
+cellSampProb2 = cellSampProb[notNA]
+
+   #L'objectiu és tenir un objecte igual que cellsamples2. 
+bgCellId = sample (x = cellSamples2,size = 3207, replace = F, prob = cellSampProb2)
+bg.xy2 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
+bg.xy2 = as.data.frame (bg.xy)
+rm(vv)
+
+#############################################
+
+vv = values (envsBgMsk3)
+cellSamples = 1:nrow(vv)
+notNA =complete.cases(vv)
+cellSamples2 = cellSamples [notNA] 
+
+cellSampProb = values (obrir1)
+cellSampProb2 = cellSampProb[notNA]
+
+   #L'objectiu és tenir un objecte igual que cellsamples2. 
+bgCellId = sample (x = cellSamples2,size = 3207, replace = F, prob = cellSampProb2)
+bg.xy3 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
+bg.xy3 = as.data.frame (bg.xy)
+rm(vv)
+
+###########################################################
+
+vv = values (envsBgMsk4)
+cellSamples = 1:nrow(vv)
+notNA =complete.cases(vv)
+cellSamples2 = cellSamples [notNA] 
+
+cellSampProb = values (obrir1)
+cellSampProb2 = cellSampProb[notNA]
+
+   #L'objectiu és tenir un objecte igual que cellsamples2. 
+bgCellId = sample (x = cellSamples2,size = 5539, replace = F, prob = cellSampProb2)
+bg.xy4 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
+bg.xy4 = as.data.frame (bg.xy)
+rm(vv)
+
+###########################################################
+
+vv = values (envsBgMsk5)
+cellSamples = 1:nrow(vv)
+notNA =complete.cases(vv)
+cellSamples2 = cellSamples [notNA] 
+
+cellSampProb = values (obrir1)
+cellSampProb2 = cellSampProb[notNA]
+
+   #L'objectiu és tenir un objecte igual que cellsamples2. 
+bgCellId = sample (x = cellSamples2,size = 43732, replace = F, prob = cellSampProb2)
+bg.xy5 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
+bg.xy5 = as.data.frame (bg.xy)
+rm(vv)
+
+##########################################################
+
+vv = values (envsBgMsk6)
+cellSamples = 1:nrow(vv)
+notNA =complete.cases(vv)
+cellSamples2 = cellSamples [notNA] 
+
+cellSampProb = values (obrir1)
+cellSampProb2 = cellSampProb[notNA]
+
+   #L'objectiu és tenir un objecte igual que cellsamples2. 
+bgCellId = sample (x = cellSamples2,size = 41691, replace = F, prob = cellSampProb2)
+bg.xy6 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
+bg.xy6 = as.data.frame (bg.xy)
+rm(vv)
+
+bg.xy<-rbind(bg.xy1, bg.xy2, bg.xy3, bg.xy4, bg.xy5, bg.xy6)
 ```
 
 ### Partition Occurrence Data
@@ -203,7 +337,7 @@ You selected the maxent model.
 
 ```{r}
 # define the vector of regularization multipliers to test
-rms <- seq(1, 4, 1)
+rms <- seq(1, 2, 1)
 # iterate model building over all chosen parameter settings
 e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ'), 
                           method = 'user', occs.grp, bg.grp, n.bg = 100000, clamp = TRUE, algorithm = "maxnet")
@@ -211,11 +345,11 @@ e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms,
 #A dalt està posat Maxnet, ja es el que toca o hem de canviar a maxent? Maxent triga molt menys
 
 #save the model
-readr::write_rds (e, 'ENM_models2.rds')
+readr::write_rds (e, 'ENM_modelprobabilitat.rds')
 
 #if you needed to reload the model
 
-e <- readr::read_rds ("D:/Users/munozferrandiz/Documents/MODEL1961_2000/ENM_models.rds")
+#e <- readr::read_rds ("D:/Users/munozferrandiz/Documents/MODEL1961_2000/ENM_models.rds")
 
 #with javascript (NOT IMPLEMENTED)
 # ejar <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
@@ -233,7 +367,7 @@ evalPreds <- e@predictions
 # view response curves for environmental variables with non-zero coefficients
 #dismo::response(evalMods[["L_1"]], var = c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
 
-plot(evalMods[["L_1"]], vars = c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000'), type = "cloglog")
+plot(evalMods[["LQ_1"]], vars = c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000'), type = "cloglog")
 
 
 ```
@@ -258,6 +392,7 @@ mod <- evalMods[["LQ_1"]]
 # generate logistic prediction
 #pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
 pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)  
+#writeRaster(pred, "prediccioprob5.tif")
 
 ```
 

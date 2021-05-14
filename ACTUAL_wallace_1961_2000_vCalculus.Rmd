@@ -24,6 +24,7 @@ library(rgeos)
 library(ENMeval)
 library(dplyr)
 library (tidyverse)
+library(raster)
 ```
 
 Wallace also includes several functions developed to help integrate
@@ -148,19 +149,21 @@ envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
 
 ############### OUR METHOD ########################################################### 
 
-valors<-values(envsBgMsk1)
-cellSamples1 = 1:nrow(valors)
-NoNA =complete.cases(valors)
-cellSamples3 = cellSamples1 [NoNA]
-
-cellSampProb = values (obrir1)
-cellSampProb2 = cellSampProb[notNA]
+#valors<-values(envsBgMsk1)
+#cellSamples1 = 1:nrow(valors)
+#NoNA =complete.cases(valors)
+#cellSamples3 = cellSamples1 [NoNA]
 
 vv = values (envsBgMsk)
 cellSamples = 1:nrow(vv)
 notNA =complete.cases(vv)
-cellSamples2 = cellSamples [notNA]    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 100000,replace = F, prob = cellSamples3)
+cellSamples2 = cellSamples [notNA] 
+
+cellSampProb = values (obrir1)
+cellSampProb2 = cellSampProb[notNA]
+
+   #L'objectiu és tenir un objecte igual que cellsamples2. 
+bgCellId = sample (x = cellSamples2,size = 100000,replace = F, prob = cellSampProb2)
 bg.xy = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy = as.data.frame (bg.xy)
 rm(vv)
@@ -206,7 +209,7 @@ You selected the maxent model.
 
 ```{r}
 # define the vector of regularization multipliers to test
-rms <- seq(1, 4, 1)
+rms <- seq(1, 2, 1)
 # iterate model building over all chosen parameter settings
 e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ'), 
                           method = 'user', occs.grp, bg.grp, n.bg = 100000, clamp = TRUE, algorithm = "maxnet")
@@ -214,11 +217,11 @@ e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms,
 #A dalt està posat Maxnet, ja es el que toca o hem de canviar a maxent? Maxent triga molt menys
 
 #save the model
-readr::write_rds (e, 'ENM_models2.rds')
+readr::write_rds (e, 'ENM_modelprobabilitat.rds')
 
 #if you needed to reload the model
 
-e <- readr::read_rds ("D:/Users/munozferrandiz/Documents/MODEL1961_2000/ENM_models.rds")
+#e <- readr::read_rds ("D:/Users/munozferrandiz/Documents/MODEL1961_2000/ENM_models.rds")
 
 #with javascript (NOT IMPLEMENTED)
 # ejar <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
@@ -236,7 +239,7 @@ evalPreds <- e@predictions
 # view response curves for environmental variables with non-zero coefficients
 #dismo::response(evalMods[["L_1"]], var = c('mitjanaaridityIndexThornthwaite_1961_2000.tif', 'mitjanabio9_1961_2000.tif', 'mitjanabio15_1961_2000.tif', 'mitjanabio18_1961_2000.tif', 'mitjanacontinentality_1961_2000.tif', 'mitjanamonthCountByTemp10_1961_2000.tif', 'mitjanaPETColdestQuarter_1961_2000.tif', 'mitjanaPETWettestQuarter_1961_2000.tif'))
 
-plot(evalMods[["L_1"]], vars = c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000'), type = "cloglog")
+plot(evalMods[["LQ_1"]], vars = c('mitjanaaridityIndexThornthwaite_1961_2000', 'mitjanabio9_1961_2000', 'mitjanabio15_1961_2000', 'mitjanabio18_1961_2000', 'mitjanacontinentality_1961_2000', 'mitjanamonthCountByTemp10_1961_2000', 'mitjanaPETColdestQuarter_1961_2000', 'mitjanaPETWettestQuarter_1961_2000'), type = "cloglog")
 
 
 ```
@@ -261,6 +264,7 @@ mod <- evalMods[["LQ_1"]]
 # generate logistic prediction
 #pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
 pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)  
+#writeRaster(pred, "prediccioprob5.tif")
 
 ```
 
