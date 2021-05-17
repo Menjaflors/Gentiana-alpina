@@ -17,7 +17,7 @@ library(raster)
 ################################ BW 5 ###########################################
 
 setwd("C:/Users/munozferrandiz/Desktop/NETES/Decades")
-data1<-read.csv("./GENTIANA_ALPINAfiltrada.csv")    # Si ho hagu?s de fer per d?cades, una per una. 
+data1<-read.csv("./OccsST.csv")    # Si ho hagu?s de fer per d?cades, una per una. 
 obre<-raster("./bio8.tif")
 
 # prepare coordinates, data, and proj4string
@@ -32,13 +32,13 @@ datatrans<-spdf <- SpatialPointsDataFrame(coords      = coords,
 class(datatrans)
 pt.kde <- sp.kde(x = datatrans, bw = 5, standardize = T, 
                  newdata = obre, scale.factor = 1 )
-writeRaster(pt.kde, "D:/PROBABILITATS/Provaraster1961_2020_5.tif", overwrite=T)
+writeRaster(pt.kde, "C:/Users/munozferrandiz/Desktop/Projeccions prov/Provaraster1961_2020_5_OCCST.tif", overwrite=T)
 plot(pt.kde)
 
 ################################ BW 1 ###########################################
 
 setwd("C:/Users/munozferrandiz/Desktop/NETES/Decades")
-data1<-read.csv("./GENTIANA_ALPINAfiltrada.csv")    # Si ho hagu?s de fer per d?cades, una per una. 
+data1<-read.csv("./OccsST.csv")    # Si ho hagu?s de fer per d?cades, una per una. 
 obre<-raster("./bio8.tif")
 
 # prepare coordinates, data, and proj4string
@@ -53,7 +53,7 @@ datatrans<-spdf <- SpatialPointsDataFrame(coords      = coords,
 class(datatrans)
 pt.kde <- sp.kde(x = datatrans, bw = 1, standardize = T, 
                  newdata = obre, scale.factor = 1 )
-writeRaster(pt.kde, "D:/PROBABILITATS/Provaraster1961_2020_1.tif", overwrite=T)
+writeRaster(pt.kde, "C:/Users/munozferrandiz/Desktop/Projeccions prov/Provaraster1961_2020_1_OCCST.tif", overwrite=T)
 plot(pt.kde)
 
 #################################################################################

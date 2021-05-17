@@ -27,10 +27,6 @@ library (tidyverse)
 library(raster)
 ```
 
-Wallace also includes several functions developed to help integrate
-different packages and some additional functionality. For this reason,
-it is necessary to load the file `functions.R`, The function
-`system.file()` finds this script, and `source()` loads it.
 
 ```{r}
 source(system.file('shiny/funcs', 'functions.R', package = 'wallace'))
@@ -45,7 +41,7 @@ current workspace, change to the correct file path
 
 ```{r}
 # NOTE: provide the path to the folder that contains the CSV file 
-d.occs <- 'C:/Users/munozferrandiz/Desktop/NETES/Decades' 
+d.occs <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/decades' 
 # create path to user occurrences csv file
 userOccs.path1 <- file.path(d.occs, "1961_1970_KK.csv")
 userOccs.path2 <- file.path(d.occs, "1971_1980_KK.csv")
@@ -90,7 +86,298 @@ occs3$occID <- row.names(occs3)
 occs4$occID <- row.names(occs4)
 occs5$occID <- row.names(occs5)
 occs6$occID <- row.names(occs6)
+PRES<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/LATAULABIO_modif.csv")
 ```
+
+ Funció tuning modificada
+
+```{r}
+
+#Funció tuning modificada
+
+tuning_modif<- function (occ, env, bg.coords, occ.grp, bg.grp, method, algorithm, 
+          args, args.lab, categoricals, aggregation.factor, kfolds, 
+          bin.output, clamp, alg, rasterPreds, parallel, numCores, 
+          progbar, updateProgress, userArgs, pres=PRES) 
+{
+  if(pres==NULL){
+  pres <- as.data.frame(extract(env, occ))
+  } 
+  bg <- as.data.frame(extract(env, bg.coords))
+  numNA.pres <- sum(rowSums(is.na(pres)) > 0)
+  numNA.bg <- sum(rowSums(is.na(bg)) > 0)
+  if (numNA.pres > 0) {
+    message(paste("There are", numNA.pres, "occurrence records with NA for at least\n                  one predictor variable. Removing these records from analysis,\n                  resulting in", 
+                  nrow(pres) - numNA.pres, "records..."))
+    keepInds <- !apply(pres, 1, anyNA)
+    occ <- occ[keepInds, ]
+    occ.grp <- occ.grp[keepInds]
+    pres <- pres[keepInds, ]
+  }
+  if (numNA.bg > 0) {
+    message(paste("There are", numNA.bg, "background records with NA for at least one predictor variable.\n                  Removing these records from analysis, resulting in", 
+                  nrow(bg) - numNA.bg, "records..."))
+    keepInds <- !apply(bg, 1, anyNA)
+    bg.coords <- bg.coords[keepInds, ]
+    bg.grp <- bg.grp[keepInds]
+    bg <- bg[keepInds, ]
+  }
+  if (!is.null(categoricals)) {
+    for (i in 1:length(categoricals)) {
+      pres[, categoricals[i]] <- as.factor(pres[, categoricals[i]])
+      bg[, categoricals[i]] <- as.factor(bg[, categoricals[i]])
+    }
+  }
+  if ("checkerboard1" %in% method) {
+    method <- c(method = "checkerboard1", aggregation.factor = aggregation.factor)
+    group.data <- get.checkerboard1(occ, env, bg.coords, 
+                                    aggregation.factor)
+  }
+  if ("checkerboard2" %in% method) {
+    method <- c(method = "checkerboard2", aggregation.factor = aggregation.factor)
+    group.data <- get.checkerboard2(occ, env, bg.coords, 
+                                    aggregation.factor)
+  }
+  if ("block" %in% method) 
+    group.data <- get.block(occ, bg.coords)
+  if ("jackknife" %in% method) 
+    group.data <- get.jackknife(occ, bg.coords)
+  if ("randomkfold" %in% method) {
+    method <- c(method = "randomkfold", number.folds = kfolds)
+    group.data <- get.randomkfold(occ, bg.coords, kfolds)
+  }
+  if ("user" %in% method) {
+    method <- c(method = "user", number.folds = length(unique(occ.grp)))
+    group.data <- get.user(occ.grp, bg.grp)
+  }
+  nk <- length(unique(group.data$occ.grp))
+  if (parallel == TRUE) {
+    allCores <- detectCores()
+    if (is.null(numCores)) {
+      numCores <- allCores
+    }
+    c1 <- makeCluster(numCores)
+    registerDoParallel(c1)
+    numCoresUsed <- getDoParWorkers()
+    message(paste("Of", allCores, "total cores using", 
+                  numCoresUsed))
+    message("Running in parallel...")
+    if (algorithm == "maxnet") {
+      out <- foreach(i = seq_len(length(args)), .packages = c("dismo", 
+                                                              "raster", "ENMeval", "maxnet")) %dopar% 
+        {
+          modelTune.maxnet(pres, bg, env, nk, group.data, 
+                           args[[i]], rasterPreds, clamp)
+        }
+    }
+    else if (algorithm == "maxent.jar") {
+      out <- foreach(i = seq_len(length(args)), .packages = c("dismo", 
+                                                              "raster", "ENMeval", "rJava")) %dopar% 
+        {
+          modelTune.maxentJar(pres, bg, env, nk, group.data, 
+                              args[[i]], userArgs, rasterPreds, clamp)
+        }
+    }
+    stopCluster(c1)
+  }
+  else {
+    out <- list()
+    if (progbar == TRUE & !is.function(updateProgress)) {
+      pb <- txtProgressBar(0, length(args), style = 3)
+    }
+    for (i in 1:length(args)) {
+      if (length(args) > 1) {
+        if (is.function(updateProgress)) {
+          text <- paste0("Running ", args.lab[[1]][i], 
+                         args.lab[[2]][i], "...")
+          updateProgress(detail = text)
+        }
+        else if (progbar == TRUE) {
+          setTxtProgressBar(pb, i)
+        }
+      }
+      if (algorithm == "maxnet") {
+        out[[i]] <- modelTune.maxnet(pres, bg, env, nk, 
+                                     group.data, args[[i]], rasterPreds, clamp)
+      }
+      else if (algorithm == "maxent.jar") {
+        out[[i]] <- modelTune.maxentJar(pres, bg, env, 
+                                        nk, group.data, args[[i]], userArgs, rasterPreds, 
+                                        clamp)
+      }
+    }
+    if (progbar == TRUE) 
+      close(pb)
+  }
+  full.mods <- lapply(out, function(x) x[[1]])
+  statsTbl <- as.data.frame(t(sapply(out, function(x) x[[2]])))
+  if (rasterPreds) {
+    predictive.maps <- stack(sapply(out, function(x) x[[3]]))
+  }
+  else {
+    predictive.maps <- stack()
+  }
+  AUC.DIFF <- statsTbl[, 1:nk]
+  AUC.TEST <- statsTbl[, (nk + 1):(2 * nk)]
+  OR10 <- statsTbl[, ((2 * nk) + 1):(3 * nk)]
+  ORmin <- statsTbl[, ((3 * nk) + 1):(4 * nk)]
+  names(AUC.DIFF) <- paste("diff.AUC_bin", 1:nk, sep = ".")
+  Mean.AUC.DIFF <- rowMeans(AUC.DIFF)
+  Var.AUC.DIFF <- corrected.var(AUC.DIFF, nk)
+  names(AUC.TEST) <- paste("AUC_bin", 1:nk, sep = ".")
+  Mean.AUC <- rowMeans(AUC.TEST)
+  Var.AUC <- corrected.var(AUC.TEST, nk)
+  names(OR10) <- paste("test.or10pct_bin", 1:nk, sep = ".")
+  Mean.OR10 <- rowMeans(OR10)
+  Var.OR10 <- apply(OR10, 1, var)
+  names(ORmin) <- paste("test.orMTP_bin", 1:nk, sep = ".")
+  Mean.ORmin <- rowMeans(ORmin)
+  Var.ORmin <- apply(ORmin, 1, var)
+  full.AUC <- double()
+  for (i in 1:length(full.mods)) {
+    if (algorithm == "maxnet") {
+      full.AUC[i] <- dismo::evaluate(pres, bg, full.mods[[i]])@auc
+    }
+    else if (algorithm == "maxent.jar") {
+      full.AUC[i] <- full.mods[[i]]@results[5]
+    }
+  }
+  nparam <- numeric()
+  for (i in 1:length(full.mods)) {
+    if (algorithm == "maxnet") {
+      nparam[i] <- length(full.mods[[i]]$betas)
+    }
+    else if (algorithm == "maxent.jar") {
+      nparam[i] <- get.params(full.mods[[i]])
+    }
+  }
+  aicc <- calc.aicc(nparam, occ, predictive.maps)
+  features <- args.lab[[1]]
+  rm <- args.lab[[2]]
+  settings <- paste(args.lab[[1]], args.lab[[2]], sep = "_")
+  res <- data.frame(settings, features, rm, train.AUC = full.AUC, 
+                    avg.test.AUC = Mean.AUC, var.test.AUC = Var.AUC, avg.diff.AUC = Mean.AUC.DIFF, 
+                    var.diff.AUC = Var.AUC.DIFF, avg.test.orMTP = Mean.ORmin, 
+                    var.test.orMTP = Var.ORmin, avg.test.or10pct = Mean.OR10, 
+                    var.test.or10pct = Var.OR10, aicc)
+  if (bin.output == TRUE) {
+    res <- as.data.frame(cbind(res, AUC.TEST, AUC.DIFF, OR10, 
+                               ORmin))
+  }
+  if (rasterPreds == TRUE) {
+    names(predictive.maps) <- settings
+  }
+  results <- ENMevaluation(algorithm = alg, results = res, 
+                           predictions = predictive.maps, models = full.mods, partition.method = method, 
+                           occ.pts = occ, occ.grp = group.data[[1]], bg.pts = bg.coords, 
+                           bg.grp = group.data[[2]])
+  return(results)
+}
+
+
+
+```
+
+ Funció enmevaluate modificada
+
+```{r}
+enmevaluate_modif<-function (occ, env, bg.coords = NULL, occ.grp = NULL, bg.grp = NULL, 
+          RMvalues = seq(0.5, 4, 0.5), fc = c("L", "LQ", 
+                                              "H", "LQH", "LQHP", "LQHPT"), 
+          categoricals = NULL, n.bg = 10000, method = NULL, algorithm = "maxnet", 
+          overlap = FALSE, aggregation.factor = c(2, 2), kfolds = NA,
+          bin.output = FALSE, clamp = TRUE, rasterPreds = TRUE, parallel = FALSE, 
+          numCores = NULL, progbar = TRUE, updateProgress = FALSE, 
+          ...) 
+{
+  ptm <- proc.time()
+  if (is.null(method)) {
+    stop("Evaluation method needs to be specified.")
+  }
+  if (progbar == TRUE & is.function(updateProgress)) {
+    stop("Cannot specify both \"progbar\" and \"updateProgress\". Please turn one off.")
+  }
+  if (algorithm == "maxent.jar") {
+    userArgs <- list(...)
+    allMaxentArgs <- c("addsamplestobackground", "addallsamplestobackground", 
+                       "allowpartialdata", "beta_threshold", 
+                       "beta_categorical", "beta_lqp", "beta_hinge", 
+                       "convergencethreshold", "defaultprevalence", 
+                       "extrapolate", "fadebyclamping", "jackknife", 
+                       "maximumbackground", "maximumiterations", 
+                       "removeduplicates")
+    if (length(userArgs) == 0) {
+      userArgs <- NULL
+    }
+    else {
+      if (!all(names(userArgs) %in% allMaxentArgs)) {
+        stop("The maxent argument given is not implemented in ENMeval or is misspelled.")
+      }
+      else {
+        userArgs <- paste(names(userArgs), unlist(userArgs), 
+                          sep = "=")
+      }
+    }
+    args <- make.args(RMvalues, fc)
+    dismo.vs <- packageVersion("dismo")
+    v <- maxentJARversion()
+    alg <- paste("Maxent", v, "via dismo", dismo.vs)
+  }
+  else if (algorithm == "maxnet") {
+    args.fc <- as.list(tolower(rep(fc, times = length(RMvalues))))
+    args.rm <- as.list(sort(rep(RMvalues, times = length(fc))))
+    args <- mapply(c, args.fc, args.rm, SIMPLIFY = FALSE)
+    maxnet.vs <- packageVersion("maxnet")
+    alg <- paste0("maxnet v.", maxnet.vs)
+    userArgs <- NULL
+  }
+  message(paste("*** Running ENMevaluate using", alg, 
+                "***"))
+  args.lab <- make.args(RMvalues, fc, labels = TRUE)
+  if (is.null(bg.coords)) {
+    bg.coords <- randomPoints(env[[1]], n = n.bg)
+  }
+  occ <- as.data.frame(occ)
+  colnames(occ) <- c("LON", "LAT")
+  bg.coords <- as.data.frame(bg.coords)
+  colnames(bg.coords) <- c("LON", "LAT")
+  message(ifelse(method == "jackknife", "Doing evaluations using k-1 jackknife...", 
+                 ifelse(method == "checkerboard1", "Doing evaluations using checkerboard 1...", 
+                        ifelse(method == "checkerboard2", "Doing evaluations using checkerboard 2...", 
+                               ifelse(method == "block", "Doing evaluations using spatial blocks...", 
+                                      ifelse(method == "randomkfold", "Doing random k-fold evaluation groups...", 
+                                             ifelse(method == "user", "Doing user-defined evaluation groups...", 
+                                                    "Error: You need to specify an accepted evaluation method. Check the documentation.")))))))
+  results <- tuning_modif(occ, env, bg.coords, occ.grp, bg.grp, method, 
+                    algorithm, args, args.lab, categoricals, aggregation.factor, 
+                    kfolds, bin.output, clamp, alg, rasterPreds, parallel, 
+                    numCores, progbar, updateProgress, userArgs, pres==PRES)
+  if (overlap == TRUE) {
+    if (length(args) > 1) {
+      if (nlayers(results@predictions) > 1) {
+        message("Calculating niche overlap")
+        overlap.mat <- calc.niche.overlap(results@predictions, 
+                                          "D")
+        results@overlap <- overlap.mat
+      }
+      else {
+        message("Cannot calculate niche overlap without rasterPreds")
+      }
+    }
+    else {
+      message("Need >1 settings to do niche overlap")
+    }
+  }
+  timed <- proc.time() - ptm
+  t.min <- floor(timed[3]/60)
+  t.sec <- timed[3] - (t.min * 60)
+  message(paste("ENMeval completed in", t.min, "minutes", 
+                round(t.sec, 1), "seconds."))
+  return(results)
+}
+
+```
+
 
 
 ### Process Occurrence Data
@@ -115,12 +402,12 @@ bioclimatic dataset at resolution of 2.5 arcmin.
 
 ```{r}
 # NOTE: provide the path to the folder that contains the rasters
-d.envs1961_1970 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/1961_1970'
-d.envs1971_1980 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/1971_1980'
-d.envs1981_1990 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/1981_1990'
-d.envs1991_2000 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/1991_2000'
-d.envs2001_2010 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/2001_2010'
-d.envs2010_2020 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/decades/2010_2020'
+d.envs1961_1970 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/1961_1970'
+d.envs1971_1980 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/1971_1980'
+d.envs1981_1990 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/1981_1990'
+d.envs1991_2000 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/1991_2000'
+d.envs2001_2010 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/2001_2010'
+d.envs2011_2020 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/2011_2020'
 
 # create paths to the raster files
 userRas.paths1961_1970 <- file.path(d.envs1961_1970, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
@@ -193,12 +480,12 @@ obrir16<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplin
 
 
 
-obrir51<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1961_1970_5.tif")
-obrir52<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1971_1980_5.tif")
-obrir53<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1981_1990_5.tif")
-obrir54<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1991_2000_5.tif")
-obrir55<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2001_2010_5.tif")
-obrir56<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2011_2020_5.tif")
+#obrir51<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1961_1970_5.tif")
+#obrir52<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1971_1980_5.tif")
+#obrir53<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1981_1990_5.tif")
+#obrir54<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1991_2000_5.tif")
+#obrir55<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2001_2010_5.tif")
+#obrir56<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2011_2020_5.tif")
 
 
 envsBgCrop1 <- raster::crop(envs1, bgExt)
@@ -237,7 +524,7 @@ cellSampProb = values (obrir11)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 2624, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 2624, replace = F)   #, prob= cellSampProb2    aquí i a les 5 dècades restants
 bg.xy1 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy1 = as.data.frame (bg.xy)
 rm(vv)
@@ -254,7 +541,7 @@ cellSampProb = values (obrir12)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 3207, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 3207, replace = F)
 bg.xy2 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy2 = as.data.frame (bg.xy)
 rm(vv)
@@ -270,7 +557,7 @@ cellSampProb = values (obrir13)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 3207, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 3207, replace = F)
 bg.xy3 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy3 = as.data.frame (bg.xy)
 rm(vv)
@@ -286,7 +573,7 @@ cellSampProb = values (obrir14)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 5539, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 5539, replace = F)
 bg.xy4 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy4 = as.data.frame (bg.xy)
 rm(vv)
@@ -302,7 +589,7 @@ cellSampProb = values (obrir15)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 43732, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 43732, replace = F)
 bg.xy5 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy5 = as.data.frame (bg.xy)
 rm(vv)
@@ -318,7 +605,7 @@ cellSampProb = values (obrir16)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 41691, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 41691, replace = F)
 bg.xy6 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
 bg.xy6 = as.data.frame (bg.xy)
 rm(vv)
@@ -365,7 +652,7 @@ You selected the maxent model.
 # define the vector of regularization multipliers to test
 rms <- seq(1, 2, 1)
 # iterate model building over all chosen parameter settings
-e <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ'), 
+e <- enmevaluate_modif(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ'), 
                           method = 'user', occs.grp, bg.grp, n.bg = 100000, clamp = TRUE, algorithm = "maxnet")
 
 #A dalt està posat Maxnet, ja es el que toca o hem de canviar a maxent? Maxent triga molt menys
