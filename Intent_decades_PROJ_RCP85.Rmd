@@ -98,7 +98,7 @@ PRES<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/LATAULABIO_modi
 tuning_modif<- function (occ, env, bg.coords, occ.grp, bg.grp, method, algorithm, 
           args, args.lab, categoricals, aggregation.factor, kfolds, 
           bin.output, clamp, alg, rasterPreds, parallel, numCores, 
-          progbar, updateProgress, userArgs, pres=PRES) 
+          progbar, updateProgress, userArgs, pres) 
 {
   if(pres==NULL){
   pres <- as.data.frame(extract(env, occ))
@@ -287,7 +287,7 @@ enmevaluate_modif<-function (occ, env, bg.coords = NULL, occ.grp = NULL, bg.grp 
           categoricals = NULL, n.bg = 10000, method = NULL, algorithm = "maxnet", 
           overlap = FALSE, aggregation.factor = c(2, 2), kfolds = NA,
           bin.output = FALSE, clamp = TRUE, rasterPreds = TRUE, parallel = FALSE, 
-          numCores = NULL, progbar = TRUE, updateProgress = FALSE, 
+          numCores = NULL, progbar = TRUE, updateProgress = FALSE,
           ...) 
 {
   ptm <- proc.time()
@@ -488,14 +488,14 @@ obrir16<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplin
 #obrir56<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2011_2020_5.tif")
 
 
-envsBgCrop1 <- raster::crop(envs1, bgExt)
+#envsBgCrop1 <- raster::crop(envs1, bgExt)
 envsBgCrop2 <- raster::crop(envs2, bgExt)
 envsBgCrop3 <- raster::crop(envs3, bgExt)
 envsBgCrop4 <- raster::crop(envs4, bgExt)
 envsBgCrop5 <- raster::crop(envs5, bgExt)
 envsBgCrop6 <- raster::crop(envs6, bgExt)
 # mask the background extent shape from the cropped raster
-envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
+#envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
 envsBgMsk2 <- raster::mask(envsBgCrop2, bgExt)
 envsBgMsk3 <- raster::mask(envsBgCrop3, bgExt)
 envsBgMsk4 <- raster::mask(envsBgCrop4, bgExt)
@@ -515,19 +515,19 @@ envsBgMsk6 <- raster::mask(envsBgCrop6, bgExt)
 #NoNA =complete.cases(valors)
 #cellSamples3 = cellSamples1 [NoNA]
 
-vv = values (envsBgMsk1)
-cellSamples = 1:nrow(vv)
-notNA =complete.cases(vv)
-cellSamples2 = cellSamples [notNA] 
+#vv = values (envsBgMsk1)
+#cellSamples = 1:nrow(vv)
+#notNA =complete.cases(vv)
+#cellSamples2 = cellSamples [notNA] 
 
-cellSampProb = values (obrir11)
-cellSampProb2 = cellSampProb[notNA]
+#cellSampProb = values (obrir11)
+#cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 2624, replace = F)   #, prob= cellSampProb2    aquí i a les 5 dècades restants
-bg.xy1 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
-bg.xy1 = as.data.frame (bg.xy)
-rm(vv)
+#bgCellId = sample (x = cellSamples2, size = 2624, replace = F, prob = cellSampProb2)   #, prob= cellSampProb2    aquí i a les 5 dècades restants
+#bg.xy1 = raster::xyFromCell(envsBgMsk1,cell = bgCellId)
+#bg.xy1 = as.data.frame (bg.xy1)
+#rm(vv)
 
 
 ############################################
@@ -541,9 +541,9 @@ cellSampProb = values (obrir12)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 3207, replace = F)
-bg.xy2 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
-bg.xy2 = as.data.frame (bg.xy)
+bgCellId = sample (x = cellSamples2, size = 3207, replace = F, prob = cellSampProb2)
+bg.xy2 = raster::xyFromCell(envsBgMsk2,cell = bgCellId)
+bg.xy2 = as.data.frame (bg.xy2)
 rm(vv)
 
 #############################################
@@ -557,9 +557,9 @@ cellSampProb = values (obrir13)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 3207, replace = F)
-bg.xy3 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
-bg.xy3 = as.data.frame (bg.xy)
+bgCellId = sample (x = cellSamples2,size = 3207, replace = F, prob = cellSampProb2)
+bg.xy3 = raster::xyFromCell(envsBgMsk3,cell = bgCellId)
+bg.xy3 = as.data.frame (bg.xy3)
 rm(vv)
 
 ###########################################################
@@ -573,9 +573,9 @@ cellSampProb = values (obrir14)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 5539, replace = F)
-bg.xy4 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
-bg.xy4 = as.data.frame (bg.xy)
+bgCellId = sample (x = cellSamples2,size = 5539, replace = F, prob = cellSampProb2)
+bg.xy4 = raster::xyFromCell(envsBgMsk4,cell = bgCellId)
+bg.xy4 = as.data.frame (bg.xy4)
 rm(vv)
 
 ###########################################################
@@ -589,9 +589,9 @@ cellSampProb = values (obrir15)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 43732, replace = F)
-bg.xy5 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
-bg.xy5 = as.data.frame (bg.xy)
+bgCellId = sample (x = cellSamples2,size = 43732, replace = F, prob = cellSampProb2)
+bg.xy5 = raster::xyFromCell(envsBgMsk5,cell = bgCellId)
+bg.xy5 = as.data.frame (bg.xy5)
 rm(vv)
 
 ##########################################################
@@ -605,9 +605,9 @@ cellSampProb = values (obrir16)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 41691, replace = F)
-bg.xy6 = raster::xyFromCell(envsBgMsk,cell = bgCellId)
-bg.xy6 = as.data.frame (bg.xy)
+bgCellId = sample (x = cellSamples2,size = 41691, replace = F, prob = cellSampProb2)
+bg.xy6 = raster::xyFromCell(envsBgMsk6,cell = bgCellId)
+bg.xy6 = as.data.frame (bg.xy6)
 rm(vv)
 
 bg.xy<-rbind(bg.xy1, bg.xy2, bg.xy3, bg.xy4, bg.xy5, bg.xy6)
@@ -662,7 +662,7 @@ readr::write_rds (e, 'ENM_modelprobabilitat.rds')
 
 #if you needed to reload the model
 
-#e <- readr::read_rds ("D:/Users/munozferrandiz/Documents/MODEL1961_2000/ENM_models.rds")
+#e <- readr::read_rds ("D:/Users/munozferrandiz/Documents/MODEL1961_2000/modeldecades.rds")
 
 #with javascript (NOT IMPLEMENTED)
 # ejar <- ENMeval::ENMevaluate(occs.xy, envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ', 'H'), 
@@ -705,7 +705,7 @@ mod <- evalMods[["LQ_1"]]
 # generate logistic prediction
 #pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
 pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)  
-#writeRaster(pred, "prediccioprob5.tif")
+writeRaster(pred, "D:/Users/munozferrandiz/Documents/MODEL1961_2000/RESULTATS/preddecades.tif")
 
 ```
 
