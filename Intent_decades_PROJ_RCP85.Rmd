@@ -121,8 +121,6 @@ bioclimatic dataset at resolution of 2.5 arcmin.
 
 ```{r}
 
-source("")
-
 # NOTE: provide the path to the folder that contains the rasters
 d.envs1961_1970 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/1961_1970'
 d.envs1971_1980 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/1971_1980'
