@@ -16,7 +16,7 @@ c7<-raster("D:/Bioclimatiques_rcp45/1961_1970/PETColdestQuarter.tif")
 c8<-raster("D:/Bioclimatiques_rcp45/1961_1970/PETWettestQuarter.tif")
 c1961_1970<-stack(c1, c2, c3, c4, c5, c6, c7, c8)
 
-punts<-read.csv("C:/Users/munozferrandiz/Desktop/provabackgrounds/1961.csv")
+punts<-read.csv("C:/Users/munozferrandiz/Desktop/provabackgrounds/1961_1970.csv")
 punts<-subset(punts, select=-X)
 prova<-extract(x=c1961_1970, punts, method="bilinear", df=T)
 write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1961_1970sensecoordenades.csv", row.names = F)
@@ -44,7 +44,7 @@ c1971_1980<-stack(c1, c2, c3, c4, c5, c6, c7, c8)
 punts<-read.csv("C:/Users/munozferrandiz/Desktop/provabackgrounds/1971_1980.csv")
 punts<-subset(punts, select=-X)
 prova<-extract(x=c1971_1980, punts, method="bilinear", df=T)
-write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1971_1980sensecoordenades.csv", row.names = F)
+write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1971_1980BGextract.csv", row.names = F)
 
 ####################################1981_1990####################################
 
@@ -61,7 +61,7 @@ c1981_1990<-stack(c1, c2, c3, c4, c5, c6, c7, c8)
 punts<-read.csv("C:/Users/munozferrandiz/Desktop/provabackgrounds/1981_1990.csv")
 punts<-subset(punts, select=-X)
 prova<-extract(x=c1981_1990, punts, method="bilinear", df=T)
-write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1981_1990sensecoordenades.csv", row.names = F)
+write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1981_1990BGextract.csv", row.names = F)
 
 ####################################1991_2000####################################
 
@@ -78,7 +78,7 @@ c1991_2000<-stack(c1, c2, c3, c4, c5, c6, c7, c8)
 punts<-read.csv("C:/Users/munozferrandiz/Desktop/provabackgrounds/1991_2000.csv")
 punts<-subset(punts, select=-X)
 prova<-extract(x=c1991_2000, punts, method="bilinear", df=T)
-write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1991_2000sensecoordenades.csv", row.names = F)
+write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1991_2000BGextract.csv", row.names = F)
 
 ####################################2001_2010####################################
 
@@ -95,7 +95,7 @@ c2001_2010<-stack(c1, c2, c3, c4, c5, c6, c7, c8)
 punts<-read.csv("C:/Users/munozferrandiz/Desktop/provabackgrounds/2001_2010.csv")
 punts<-subset(punts, select=-X)
 prova<-extract(x=c2001_2010, punts, method="bilinear", df=T)
-write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/2001_2010sensecoordenades.csv", row.names = F)
+write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/2001_2010BGextract.csv", row.names = F)
 
 ####################################2011_2020####################################
 
@@ -112,4 +112,4 @@ c2011_2020<-stack(c1, c2, c3, c4, c5, c6, c7, c8)
 punts<-read.csv("C:/Users/munozferrandiz/Desktop/provabackgrounds/2011_2020.csv")
 punts<-subset(punts, select=-X)
 prova<-extract(x=c2011_2020, punts, method="bilinear", df=T)
-write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/2011_2020sensecoordenades.csv", row.names = F)
+write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/2011_2020BGextract.csv", row.names = F)
