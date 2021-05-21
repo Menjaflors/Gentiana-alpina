@@ -19,7 +19,7 @@ c1961_1970<-stack(c1, c2, c3, c4, c5, c6, c7, c8)
 punts<-read.csv("C:/Users/munozferrandiz/Desktop/provabackgrounds/1961_1970.csv")
 punts<-subset(punts, select=-X)
 prova<-extract(x=c1961_1970, punts, method="bilinear", df=T)
-write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1961_1970sensecoordenades.csv", row.names = F)
+write.csv(prova, "C:/Users/munozferrandiz/Desktop/provabackgrounds/1961_1970BGextract.csv", row.names = F)
 prova1<-merge(punts, prova)
 
 yy<-vector(2)

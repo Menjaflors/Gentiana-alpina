@@ -43,12 +43,12 @@ current workspace, change to the correct file path
 # NOTE: provide the path to the folder that contains the CSV file 
 d.occs <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/decades' 
 # create path to user occurrences csv file
-userOccs.path1 <- file.path(d.occs, "1961_1970_KK.csv")
-userOccs.path2 <- file.path(d.occs, "1971_1980_KK.csv")
-userOccs.path3 <- file.path(d.occs, "1981_1990_KK.csv")
-userOccs.path4 <- file.path(d.occs, "1991_2000_KK.csv")
-userOccs.path5 <- file.path(d.occs, "2001_2010_KK.csv")
-userOccs.path6 <- file.path(d.occs, "2011_2020_KK.csv")
+userOccs.path1 <- file.path(d.occs, "1961_1970_KK_ST.csv")
+userOccs.path2 <- file.path(d.occs, "1971_1980_KK_ST.csv")
+userOccs.path3 <- file.path(d.occs, "1981_1990_KK_ST.csv")
+userOccs.path4 <- file.path(d.occs, "1991_2000_KK_ST.csv")
+userOccs.path5 <- file.path(d.occs, "2001_2010_KK_ST.csv")
+userOccs.path6 <- file.path(d.occs, "2011_2020_KK_ST.csv")
 # read in csv
 userOccs1.csv <- read.csv(userOccs.path1, header = T)
 userOccs2.csv <- read.csv(userOccs.path2, header = T)
@@ -76,7 +76,8 @@ occs3 <- occs3[complete.cases(occs3$longitude, occs3$latitude), ]
 occs4 <- occs4[complete.cases(occs4$longitude, occs4$latitude), ]
 occs5 <- occs5[complete.cases(occs5$longitude, occs5$latitude), ]
 occs6 <- occs6[complete.cases(occs6$longitude, occs6$latitude), ]
-####AJUNTAR LES OBSERVACIONS EN UN SOL OBJECTE, NO? Tot i que al final és el mateix que pujar-ho junt. 
+
+####AJUNTAR LES OBSERVACIONS EN UN SOL OBJECTE
 occstotal<-rbind(occs1, occs2, occs3, occs4, occs5, occs6)
 # give all records a unique ID
 occstotal$occID <- row.names(occstotal)
@@ -86,16 +87,7 @@ occs3$occID <- row.names(occs3)
 occs4$occID <- row.names(occs4)
 occs5$occID <- row.names(occs5)
 occs6$occID <- row.names(occs6)
-PRES<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/LATAULABIO_modif.csv")
 
-taula1<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/1961_1970sensecoordenades.csv")
-taula2<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/1971_1980sensecoordenades.csv")
-taula3<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/1981_1990sensecoordenades.csv")
-taula4<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/1991_2000sensecoordenades.csv")
-taula5<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/2001_2010sensecoordenades.csv")
-taula6<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/2011_2020sensecoordenades.csv")
-bg<-rbind(taula1, taula2, taula3, taula4, taula5, taula6)
-bg<-subset(bg, select = -ID )
 ```
 
 
@@ -175,7 +167,7 @@ Read a .csv file and generate a Spatial Polygon object.
 
 ```{r}
 # NOTE: provide the full path to the CSV file
-csvPath <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/AREA_ESTUDI.csv'
+csvPath <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/AREA_ESTUDIKK.csv'
 # read csv with coordinates for polygon
 shp <- read.csv(csvPath, header = TRUE)
 bgExt <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(shp)), 1)))
@@ -191,31 +183,41 @@ background sample, the less variability you’ll have between runs.
 
 ```{r}
 # crop the environmental rasters by the background extent shape
-obrir11<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1961_1970_1.tif")
-obrir12<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1971_1980_1.tif")
-obrir13<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1981_1990_1.tif")
-obrir14<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1991_2000_1.tif")
-obrir15<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2001_2010_1.tif")
-obrir16<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2011_2020_1.tif")
+obrir11<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1961_1970_3.tif")
+obrir12<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1971_1980_3.tif")
+obrir13<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1981_1990_3.tif")
+obrir14<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1991_2000_3.tif")
+obrir15<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2001_2010_3.tif")
+obrir16<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2011_2020_3.tif")
+
+obrir11<-raster::crop(obrir11, bgExt)
+obrir11<-raster::mask(obrir11, bgExt)
+obrir12<-raster::crop(obrir12, bgExt)
+obrir12<-raster::mask(obrir12, bgExt)
+obrir13<-raster::crop(obrir13, bgExt)
+obrir13<-raster::mask(obrir13, bgExt)
+obrir14<-raster::crop(obrir14, bgExt)
+obrir14<-raster::mask(obrir14, bgExt)
+obrir15<-raster::crop(obrir15, bgExt)
+obrir15<-raster::mask(obrir15, bgExt)
+obrir16<-raster::crop(obrir16, bgExt)
+obrir16<-raster::mask(obrir16, bgExt)
 
 
 
-#obrir51<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1961_1970_5.tif")
-#obrir52<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1971_1980_5.tif")
-#obrir53<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1981_1990_5.tif")
-#obrir54<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster1991_2000_5.tif")
-#obrir55<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2001_2010_5.tif")
-#obrir56<-raster("D:/quercus/Partage/Pep/Gentiana_Alpina_David/background_samplings/PROBABILITATS/provaraster2011_2020_5.tif")
 
 
-#envsBgCrop1 <- raster::crop(envs1, bgExt)
+
+
+
+envsBgCrop1 <- raster::crop(envs1, bgExt)
 envsBgCrop2 <- raster::crop(envs2, bgExt)
 envsBgCrop3 <- raster::crop(envs3, bgExt)
 envsBgCrop4 <- raster::crop(envs4, bgExt)
 envsBgCrop5 <- raster::crop(envs5, bgExt)
 envsBgCrop6 <- raster::crop(envs6, bgExt)
 # mask the background extent shape from the cropped raster
-#envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
+envsBgMsk1 <- raster::mask(envsBgCrop1, bgExt)
 envsBgMsk2 <- raster::mask(envsBgCrop2, bgExt)
 envsBgMsk3 <- raster::mask(envsBgCrop3, bgExt)
 envsBgMsk4 <- raster::mask(envsBgCrop4, bgExt)
@@ -235,19 +237,19 @@ envsBgMsk6 <- raster::mask(envsBgCrop6, bgExt)
 #NoNA =complete.cases(valors)
 #cellSamples3 = cellSamples1 [NoNA]
 
-#vv = values (envsBgMsk1)
-#cellSamples = 1:nrow(vv)
-#notNA =complete.cases(vv)
-#cellSamples2 = cellSamples [notNA] 
+vv = values (envsBgMsk1)
+cellSamples = 1:nrow(vv)
+notNA =complete.cases(vv)
+cellSamples2 = cellSamples [notNA] 
 
-#cellSampProb = values (obrir11)
-#cellSampProb2 = cellSampProb[notNA]
+cellSampProb = values (obrir11)
+cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-#bgCellId = sample (x = cellSamples2, size = 2624, replace = F, prob = cellSampProb2)   #, prob= cellSampProb2    aquí i a les 5 dècades restants
-#bg.xy1 = raster::xyFromCell(envsBgMsk1,cell = bgCellId)
-#bg.xy1 = as.data.frame (bg.xy1)
-#rm(vv)
+bgCellId = sample (x = cellSamples2, size = 2000, replace = F, prob = cellSampProb2)   #, prob= cellSampProb2    aquí i a les 5 dècades restants
+bg.xy1 = raster::xyFromCell(envsBgMsk1,cell = bgCellId)
+bg.xy1 = as.data.frame (bg.xy1)
+rm(vv)
 
 
 ############################################
@@ -261,7 +263,7 @@ cellSampProb = values (obrir12)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2, size = 3207, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2, size = 3500, replace = F, prob = cellSampProb2)
 bg.xy2 = raster::xyFromCell(envsBgMsk2,cell = bgCellId)
 bg.xy2 = as.data.frame (bg.xy2)
 rm(vv)
@@ -277,7 +279,7 @@ cellSampProb = values (obrir13)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 3207, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 4000, replace = F, prob = cellSampProb2)
 bg.xy3 = raster::xyFromCell(envsBgMsk3,cell = bgCellId)
 bg.xy3 = as.data.frame (bg.xy3)
 rm(vv)
@@ -293,7 +295,7 @@ cellSampProb = values (obrir14)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 5539, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 5000, replace = F, prob = cellSampProb2)
 bg.xy4 = raster::xyFromCell(envsBgMsk4,cell = bgCellId)
 bg.xy4 = as.data.frame (bg.xy4)
 rm(vv)
@@ -309,7 +311,7 @@ cellSampProb = values (obrir15)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 43732, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 43000, replace = F, prob = cellSampProb2)
 bg.xy5 = raster::xyFromCell(envsBgMsk5,cell = bgCellId)
 bg.xy5 = as.data.frame (bg.xy5)
 rm(vv)
@@ -325,12 +327,34 @@ cellSampProb = values (obrir16)
 cellSampProb2 = cellSampProb[notNA]
 
    #L'objectiu és tenir un objecte igual que cellsamples2. 
-bgCellId = sample (x = cellSamples2,size = 41691, replace = F, prob = cellSampProb2)
+bgCellId = sample (x = cellSamples2,size = 42500, replace = F, prob = cellSampProb2)
 bg.xy6 = raster::xyFromCell(envsBgMsk6,cell = bgCellId)
 bg.xy6 = as.data.frame (bg.xy6)
 rm(vv)
 
 bg.xy<-rbind(bg.xy1, bg.xy2, bg.xy3, bg.xy4, bg.xy5, bg.xy6)
+
+write.csv(bg.xy1, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/coordenades/1961_1970.csv")
+write.csv(bg.xy2, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/coordenades/1971_1980.csv")
+write.csv(bg.xy3, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/coordenades/1981_1990.csv")
+write.csv(bg.xy4, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/coordenades/1991_2000.csv")
+write.csv(bg.xy5, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/coordenades/2001_2010.csv")
+write.csv(bg.xy6, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/coordenades/2011_2020.csv")
+
+PRES<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/LATAULABIO_ST.csv")
+
+####AJUNTAR ELS BACKGROUND PONDERAT EN UN SOL OBJECTE
+taula1<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/valors/1961_1970BGextract.csv")
+taula2<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/valors/1971_1980BGextract.csv")
+taula3<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/valors/1981_1990BGextract.csv")
+taula4<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/valors/1991_2000BGextract.csv")
+taula5<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/valors/2001_2010BGextract.csv")
+taula6<-read.csv("D:/quercus/Partage/Pep/Gentiana_Alpina_David/ocs/background_samplings_decades/valors/2011_2020BGextract.csv")
+bg<-rbind(taula1, taula2, taula3, taula4, taula5, taula6)
+bg<-subset(bg, select = -ID )
+BG <- bg
+BG <- BG [,names(PRES)]
+
 ```
 
 ### Partition Occurrence Data
@@ -379,13 +403,22 @@ You selected the maxent model.
 # define the vector of regularization multipliers to test
 rms <- seq(1, 2, 1)
 # iterate model building over all chosen parameter settings
-e <- enmevaluate_modif(occ = occs.xy, env = envsBgMsk, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ'), 
-                          method = 'user', occs.grp, bg.grp, n.bg = 100000, clamp = TRUE, algorithm = "maxnet")
+
+lf = list.files('D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/Calibracio/1961_1970/',full.names = T)
+
+envsBgMsk1 = raster::stack(lf)
+envsBgMsk1 <- raster::crop(envsBgMsk1, bgExt)
+envsBgMsk1 <- raster::crop(envsBgMsk1, bgExt)  #Afegit de nou
+envsBgMsk1 <- raster::mask(envsBgMsk1, bgExt)  #també
+
+e <- enmevaluate_modif(occ = occs.xy, env = envsBgMsk1, bg.coords = bg.xy, RMvalues = rms, fc = c('L', 'LQ'),  method = 'user', occs.grp, bg.grp, n.bg = 100000, clamp = TRUE, algorithm = "maxnet",
+                       PRES = PRES, BG=BG)
+
 
 #A dalt està posat Maxnet, ja es el que toca o hem de canviar a maxent? Maxent triga molt menys
 
 #save the model
-readr::write_rds (e, 'ENM_modelprobabilitat.rds')
+readr::write_rds (e, 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/modelGAdefinitiu.rds')
 
 #if you needed to reload the model
 
@@ -431,14 +464,34 @@ mod <- evalMods[["LQ_1"]]
 
 # generate logistic prediction
 #pred <- dismo::predict(mod, envsBgMsk, args = c("outputformat=logistic"))
-pred <- ENMeval::maxnet.predictRaster(mod, envsBgMsk, type = 'logistic', clamp = TRUE)  
-writeRaster(pred, "D:/Users/munozferrandiz/Documents/MODEL1961_2000/RESULTATS/preddecades.tif")
+pred1961_1970 <- ENMeval::maxnet.predictRaster(mod, envsBgMsk1, type = 'logistic', clamp = TRUE)  
+writeRaster(pred1961_1970, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/GA_1961_1970.tif")
+
+pred1971_1980 <- ENMeval::maxnet.predictRaster(mod, envsBgMsk2, type = 'logistic', clamp = TRUE)  
+writeRaster(pred1971_1980, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/GA_1971_1980.tif")
+
+pred1981_1990 <- ENMeval::maxnet.predictRaster(mod, envsBgMsk3, type = 'logistic', clamp = TRUE)  
+writeRaster(pred1981_1990, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/GA_1981_1990.tif")
+
+pred1991_2000 <- ENMeval::maxnet.predictRaster(mod, envsBgMsk4, type = 'logistic', clamp = TRUE)  
+writeRaster(pred1991_2000, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/GA_1991_2000.tif")
+
+pred2001_2010 <- ENMeval::maxnet.predictRaster(mod, envsBgMsk5, type = 'logistic', clamp = TRUE)  
+writeRaster(pred2001_2010, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/GA_2001_2010.tif")
+
+pred2011_2020 <- ENMeval::maxnet.predictRaster(mod, envsBgMsk6, type = 'logistic', clamp = TRUE)  
+writeRaster(pred2011_2020, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/GA_2011_2020.tif")
 
 ```
 
 ```{r}
 # plot the model prediction
-plot(pred)
+plot(pred1961_1970)
+plot(pred1971_1980)
+plot(pred1981_1990)
+plot(pred1991_2000)
+plot(pred2001_2010)
+plot(pred2011_2020)
 ```
 
 
@@ -455,7 +508,7 @@ the model you selected.
 #projPoly <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(projCoords)), ID=1)))
 
 projPoly <- bgExt
-projection(bgExt)<-"+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
+projection(projPoly)<-"+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 
 ```
 
@@ -477,10 +530,10 @@ userRas.paths2021_2030 <- file.path(d.envs2021_2030, c('aridityIndexThornthwaite
 # make a RasterStack out of the raster files
 envsFuture <- raster::stack(userRas.paths2021_2030)  
 predsProj <- raster::crop(envsFuture, projPoly)
-predsProj <- raster::mask(predsProj, projPoly)
+predsProj2021_2030 <- raster::mask(predsProj, projPoly)
 # rename future climate variable names
 # names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
-names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+names(predsProj2021_2030) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
 # select climate variables
 # predsProj <- raster::subset(predsProj, names(envs))
 
@@ -491,22 +544,22 @@ userRas.paths2031_2040 <- file.path(d.envs2031_2040, c('aridityIndexThornthwaite
 # make a RasterStack out of the raster files
 envsFuture <- raster::stack(userRas.paths2031_2040)  
 predsProj <- raster::crop(envsFuture, projPoly)
-predsProj <- raster::mask(predsProj, projPoly)
+predsProj2031_2040 <- raster::mask(predsProj, projPoly)
 # rename future climate variable names
 # names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
-names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+names(predsProj2031_2040) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
 
 
-d.envs2041_050 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2041_2050'
+d.envs2041_2050 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2041_2050'
 # create paths to the raster files
 userRas.paths2041_2050 <- file.path(d.envs2041_2050, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
 # make a RasterStack out of the raster files
 envsFuture <- raster::stack(userRas.paths2041_2050)  
 predsProj <- raster::crop(envsFuture, projPoly)
-predsProj <- raster::mask(predsProj, projPoly)
+predsProj2041_2050 <- raster::mask(predsProj, projPoly)
 # rename future climate variable names
 # names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
-names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+names(predsProj2041_2050) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
 
 
 d.envs2051_2060 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2051_2060'
@@ -515,10 +568,10 @@ userRas.paths2051_2060 <- file.path(d.envs2051_2060, c('aridityIndexThornthwaite
 # make a RasterStack out of the raster files
 envsFuture <- raster::stack(userRas.paths2051_2060)  
 predsProj <- raster::crop(envsFuture, projPoly)
-predsProj <- raster::mask(predsProj, projPoly)
+predsProj2051_2060 <- raster::mask(predsProj, projPoly)
 # rename future climate variable names
 # names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
-names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+names(predsProj2051_2060) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
 
 
 d.envs2061_2070 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2061_2070'
@@ -527,10 +580,10 @@ userRas.paths2061_2070 <- file.path(d.envs2061_2070, c('aridityIndexThornthwaite
 # make a RasterStack out of the raster files
 envsFuture <- raster::stack(userRas.paths2061_2070)  
 predsProj <- raster::crop(envsFuture, projPoly)
-predsProj <- raster::mask(predsProj, projPoly)
+predsProj2061_2070 <- raster::mask(predsProj, projPoly)
 # rename future climate variable names
 # names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
-names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+names(predsProj2061_2070) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
 
 
 d.envs2071_2080 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2071_2080'
@@ -539,22 +592,22 @@ userRas.paths2071_2080 <- file.path(d.envs2071_2080, c('aridityIndexThornthwaite
 # make a RasterStack out of the raster files
 envsFuture <- raster::stack(userRas.paths2071_2080)  
 predsProj <- raster::crop(envsFuture, projPoly)
-predsProj <- raster::mask(predsProj, projPoly)
+predsProj2071_2080 <- raster::mask(predsProj, projPoly)
 # rename future climate variable names
 # names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
-names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+names(predsProj2071_2080) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
 
 
 d.envs2081_2090 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP85/2081_2090'
 # create paths to the raster files
-userRas.paths2091_2100 <- file.path(d.envs2081_2090, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+userRas.paths2081_2090 <- file.path(d.envs2081_2090, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
 # make a RasterStack out of the raster files
 envsFuture <- raster::stack(userRas.paths2081_2090)  
 predsProj <- raster::crop(envsFuture, projPoly)
-predsProj <- raster::mask(predsProj, projPoly)
+predsProj2081_2090 <- raster::mask(predsProj, projPoly)
 # rename future climate variable names
 # names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
-names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+names(predsProj2081_2090) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
 
 
 
@@ -564,10 +617,10 @@ userRas.paths2091_2100 <- file.path(d.envs2091_2100, c('aridityIndexThornthwaite
 # make a RasterStack out of the raster files
 envsFuture <- raster::stack(userRas.paths2091_2100)  
 predsProj <- raster::crop(envsFuture, projPoly)
-predsProj <- raster::mask(predsProj, projPoly)
+predsProj2091_2100 <- raster::mask(predsProj, projPoly)
 # rename future climate variable names
 # names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
-names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+names(predsProj2091_2100) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
 
 ```
 
@@ -575,15 +628,197 @@ names(predsProj) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'con
 
 # predict model
 
-proj <- ENMeval::maxnet.predictRaster(mod, predsProj, type = 'logistic', clamp = TRUE)
-writeraster(proj, "./projeccioprova")
+proj2021_2030 <- ENMeval::maxnet.predictRaster(mod, predsProj2021_2030, type = 'logistic', clamp = TRUE)
+writeRaster(proj2021_2030, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2021_2030_RCP85.tif")
+
+proj2031_2040 <- ENMeval::maxnet.predictRaster(mod, predsProj2031_2040, type = 'logistic', clamp = TRUE)
+writeRaster(proj2031_2040, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2031_2040_RCP85.tif")
+
+proj2041_2050 <- ENMeval::maxnet.predictRaster(mod, predsProj2041_2050, type = 'logistic', clamp = TRUE)
+writeRaster(proj2041_2050, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2041_2050_RCP85.tif")
+
+proj2051_2060 <- ENMeval::maxnet.predictRaster(mod, predsProj2051_2060, type = 'logistic', clamp = TRUE)
+writeRaster(proj2051_2060, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2051_2060_RCP85.tif")
+
+proj2061_2070 <- ENMeval::maxnet.predictRaster(mod, predsProj2061_2070, type = 'logistic', clamp = TRUE)
+writeRaster(proj2061_2070, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2061_2070_RCP85.tif")
+
+proj2071_2080 <- ENMeval::maxnet.predictRaster(mod, predsProj2071_2080, type = 'logistic', clamp = TRUE)
+writeRaster(proj2071_2080, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2071_2080_RCP85.tif")
+
+proj2081_2090 <- ENMeval::maxnet.predictRaster(mod, predsProj2081_2090, type = 'logistic', clamp = TRUE)
+writeRaster(proj2081_2090, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2081_2090_RCP85.tif")
+
+proj2091_2100 <- ENMeval::maxnet.predictRaster(mod, predsProj2091_2100, type = 'logistic', clamp = TRUE)
+writeRaster(proj2091_2100, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2091_2100_RCP85.tif")
 
 ```
 
 ```{r}
 
 # plot the model prediction
-plot(proj)
-writeRaster(proj, "./projeccioprova.tif")
+plot(proj2021_2030, main="2021_2030")
+plot(proj2031_2040, main="2031_2040")
+plot(proj2041_2050, main="2041_2050")
+plot(proj2051_2060, main="2051_2060")
+plot(proj2061_2070, main="2061_2070")
+plot(proj2071_2080, main="2071_2080")
+plot(proj2081_2090, main="2081_2090")
+plot(proj2091_2100, main="2091_2100")
+
+```
+
+#PREDICCIÓ RCP45
+
+
+```{r}
+
+#envsFuture <- raster::getData("CMIP5", var = "bio", res = 5, rcp = 45, model = "MR", year = 50)
+
+
+
+d.envs2021_2030_45 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP45/2021_2030'
+# create paths to the raster files
+userRas.paths2021_2030_45 <- file.path(d.envs2021_2030_45, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2021_2030_45)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj2021_2030_45 <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj2021_2030_45) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+# select climate variables
+# predsProj <- raster::subset(predsProj, names(envs))
+
+
+d.envs2031_2040_45 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP45/2031_2040'
+# create paths to the raster files
+userRas.paths2031_2040_45 <- file.path(d.envs2031_2040_45, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2031_2040_45)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj2031_2040_45 <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj2031_2040_45) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+
+
+d.envs2041_2050_45 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP45/2041_2050'
+# create paths to the raster files
+userRas.paths2041_2050_45 <- file.path(d.envs2041_2050_45, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2041_2050_45)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj2041_2050_45 <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj2041_2050_45) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+
+
+d.envs2051_2060_45 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP45/2051_2060'
+# create paths to the raster files
+userRas.paths2051_2060_45 <- file.path(d.envs2051_2060_45, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2051_2060_45)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj2051_2060_45 <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj2051_2060_45) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+
+
+d.envs2061_2070_45 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP45/2061_2070'
+# create paths to the raster files
+userRas.paths2061_2070_45 <- file.path(d.envs2061_2070_45, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2061_2070_45)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj2061_2070_45 <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj2061_2070_45) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+
+
+d.envs2071_2080_45 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP45/2071_2080'
+# create paths to the raster files
+userRas.paths2071_2080_45 <- file.path(d.envs2071_2080_45, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2071_2080_45)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj2071_2080_45 <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj2071_2080_45) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+
+
+d.envs2081_2090_45 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP45/2081_2090'
+# create paths to the raster files
+userRas.paths2081_2090_45 <- file.path(d.envs2081_2090_45, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2081_2090_45)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj2081_2090_45 <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj2081_2090_45) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+
+
+
+d.envs2091_2100_45 <- 'D:/quercus/Partage/Pep/Gentiana_Alpina_David/Biovars/RCP45/2091_2100'
+# create paths to the raster files
+userRas.paths2091_2100_45 <- file.path(d.envs2091_2100_45, c('aridityIndexThornthwaite.tif', 'bio9.tif', 'bio15.tif', 'bio18.tif', 'continentality.tif', 'monthCountByTemp10.tif', 'PETColdestQuarter.tif', 'PETWettestQuarter.tif'))
+# make a RasterStack out of the raster files
+envsFuture <- raster::stack(userRas.paths2091_2100_45)  
+predsProj <- raster::crop(envsFuture, projPoly)
+predsProj2091_2100_45 <- raster::mask(predsProj, projPoly)
+# rename future climate variable names
+# names(predsProj) <- paste0('bio', sprintf("%02d", 1:19))
+names(predsProj2091_2100_45) <- c('aridityIndexThornthwaite', 'bio9', 'bio15', 'bio18', 'continentality', 'monthCountByTemp10', 'PETColdestQuarter', 'PETWettestQuarter')
+
+```
+
+```{r}
+
+# predict model
+
+proj2021_2030_45 <- ENMeval::maxnet.predictRaster(mod, predsProj2021_2030_45, type = 'logistic', clamp = TRUE)
+writeRaster(proj2021_2030_45, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2021_2030_RCP45.tif")
+
+proj2031_2040_45 <- ENMeval::maxnet.predictRaster(mod, predsProj2031_2040_45, type = 'logistic', clamp = TRUE)
+writeRaster(proj2031_2040_45, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2031_2040_RCP45.tif")
+
+proj2041_2050_45 <- ENMeval::maxnet.predictRaster(mod, predsProj2041_2050_45, type = 'logistic', clamp = TRUE)
+writeRaster(proj2041_2050_45, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2041_2050_RCP45.tif")
+
+proj2051_2060_45 <- ENMeval::maxnet.predictRaster(mod, predsProj2051_2060_45, type = 'logistic', clamp = TRUE)
+writeRaster(proj2051_2060_45, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2051_2060_RCP45.tif")
+
+proj2061_2070_45 <- ENMeval::maxnet.predictRaster(mod, predsProj2061_2070_45, type = 'logistic', clamp = TRUE)
+writeRaster(proj2061_2070_45, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2061_2070_RCP45.tif")
+
+proj2071_2080_45 <- ENMeval::maxnet.predictRaster(mod, predsProj2071_2080_45, type = 'logistic', clamp = TRUE)
+writeRaster(proj2071_2080_45, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2071_2080_RCP45.tif")
+
+proj2081_2090_45 <- ENMeval::maxnet.predictRaster(mod, predsProj2081_2090_45, type = 'logistic', clamp = TRUE)
+writeRaster(proj2081_2090_45, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2081_2090_RCP45.tif")
+
+proj2091_2100_45 <- ENMeval::maxnet.predictRaster(mod, predsProj2091_2100_45, type = 'logistic', clamp = TRUE)
+writeRaster(proj2091_2100_45, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/PROJ_2091_2100_RCP45.tif")
+
+```
+
+
+```{r}
+
+# plot the model prediction
+plot(proj2021_2030_45, main="2021_2030_45")
+plot(proj2031_2040_45, main="2031_2040_45")
+plot(proj2041_2050_45, main="2041_2050_45")
+plot(proj2051_2060_45, main="2051_2060_45")
+plot(proj2061_2070_45, main="2061_2070_45")
+plot(proj2071_2080_45, main="2071_2080_45")
+plot(proj2081_2090_45, main="2081_2090_45")
+plot(proj2091_2100_45, main="2091_2100_45")
+
 ```
 
