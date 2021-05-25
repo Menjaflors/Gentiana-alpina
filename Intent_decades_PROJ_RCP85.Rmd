@@ -494,6 +494,64 @@ plot(pred2001_2010)
 plot(pred2011_2020)
 ```
 
+```{r}
+# get predicted values for occurrence grid cells
+occPredVals <- raster::extract(pred1961_1970, occs.xy)
+# define minimum training presence threshold
+thr <- thresh(occPredVals, "p10")
+# threshold model prediction
+pred1961_1970_THRESHOLD10 <- pred1961_1970 > thr
+plot(pred1961_1970_THRESHOLD10, main="1961_1970")
+writeRaster(pred1961_1970_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/pred1961_1970TH10.TIF")
+
+
+# get predicted values for occurrence grid cells
+occPredVals <- raster::extract(pred1971_1980, occs.xy)
+# define minimum training presence threshold
+thr <- thresh(occPredVals, "p10")
+# threshold model prediction
+pred1971_1980_THRESHOLD10 <- pred1971_1980 > thr
+plot(pred1971_1980_THRESHOLD10, main="1971_1980")
+writeRaster(pred1971_1980_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/pred1971_1980TH10.TIF")
+
+# get predicted values for occurrence grid cells
+occPredVals <- raster::extract(pred1981_1990, occs.xy)
+# define minimum training presence threshold
+thr <- thresh(occPredVals, "p10")
+# threshold model prediction
+pred1981_1990_THRESHOLD10 <- pred1981_1990 > thr
+plot(pred1981_1990_THRESHOLD10, main="1981_1990")
+writeRaster(pred1981_1990_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/pred1981_1990TH10.TIF")
+
+
+# get predicted values for occurrence grid cells
+occPredVals <- raster::extract(pred1991_2000, occs.xy)
+# define minimum training presence threshold
+thr <- thresh(occPredVals, "p10")
+# threshold model prediction
+pred1991_2000_THRESHOLD10 <- pred1991_2000 > thr
+plot(pred1991_2000_THRESHOLD10, main="1991_2000")
+writeRaster(pred1991_2000_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/pred1991_2000TH10.TIF")
+
+# get predicted values for occurrence grid cells
+occPredVals <- raster::extract(pred2001_2010, occs.xy)
+# define minimum training presence threshold
+thr <- thresh(occPredVals, "p10")
+# threshold model prediction
+pred2001_2010_THRESHOLD10 <- pred2001_2010 > thr
+plot(pred2001_2010_THRESHOLD10, main="2001_2010")
+writeRaster(pred2001_2010_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/pred2001_2010TH10.TIF")
+
+# get predicted values for occurrence grid cells
+occPredVals <- raster::extract(pred2011_2020, occs.xy)
+# define minimum training presence threshold
+thr <- thresh(occPredVals, "p10")
+# threshold model prediction
+pred2011_2020_THRESHOLD10 <- pred2011_2020 > thr
+plot(pred2011_2020_THRESHOLD10, main="2011_2020")
+writeRaster(pred2011_2020_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/pred2011_2020TH10.TIF")
+
+```
 
 ### Project Niche Model. Aquí hauré de canviar mil coses. 
 
@@ -822,3 +880,91 @@ plot(proj2091_2100_45, main="2091_2100_45")
 
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+# predict model
+
+proj2021_2030_THRESHOLD10 <- proj2021_2030 > thr
+plot(proj2021_2030_THRESHOLD10, main="2021_2030")
+writeRaster(proj2021_2030_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2021_2030RCP85.TIF")
+
+proj2031_2040_THRESHOLD10 <- proj2031_2040 > thr
+plot(proj2031_2040_THRESHOLD10, main="2031_2040")
+writeRaster(proj2031_2040_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2031_2040RCP85.TIF")
+
+proj2041_2050_THRESHOLD10 <- proj2041_2050 > thr
+plot(proj2041_2050_THRESHOLD10, main="2041_2050")
+writeRaster(proj2041_2050_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2041_2050RCP85.TIF")
+
+proj2051_2060_THRESHOLD10 <- proj2051_2060 > thr
+plot(proj2051_2060_THRESHOLD10, main="2051_2060")
+writeRaster(proj2051_2060_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2051_2060RCP85.TIF")
+
+proj2061_2070_THRESHOLD10 <- proj2061_2070 > thr
+plot(proj2061_2070_THRESHOLD10, main="2061_2070")
+writeRaster(proj2061_2070_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2061_2070RCP85.TIF")
+
+proj2071_2080_THRESHOLD10 <- proj2071_2080 > thr
+plot(proj2071_2080_THRESHOLD10, main="2071_2080")
+writeRaster(proj2071_2080_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2071_2080RCP85.TIF")
+
+proj2081_2090_THRESHOLD10 <- proj2081_2090 > thr
+plot(proj2081_2090_THRESHOLD10, main="2081_2090")
+writeRaster(proj2081_2090_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2081_2090RCP85.TIF")
+
+proj2091_2100_THRESHOLD10 <- proj2091_2100 > thr
+plot(proj2091_2100_THRESHOLD10, main="2091_2100")
+writeRaster(proj2091_2100_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2091_2100RCP85.TIF")
+
+
+
+proj2021_2030_45_THRESHOLD10 <- proj2021_2030_45 > thr
+plot(proj2021_2030_45_THRESHOLD10, main="2021_2030")
+writeRaster(proj2021_2030_45_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2021_2030RCP45.TIF")
+
+proj2031_2040_45_THRESHOLD10 <- proj2031_2040_45 > thr
+plot(proj2031_2040_45_THRESHOLD10, main="2031_2040")
+writeRaster(proj2031_2040_45_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2031_2040RCP45.TIF")
+
+proj2041_2050_45_THRESHOLD10 <- proj2041_2050_45 > thr
+plot(proj2041_2050_45_THRESHOLD10, main="2041_2050")
+writeRaster(proj2041_2050_45_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2041_2050RCP45.TIF")
+
+proj2051_2060_45_THRESHOLD10 <- proj2051_2060_45 > thr
+plot(proj2051_2060_45_THRESHOLD10, main="2051_2060")
+writeRaster(proj2051_2060_45_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2051_2060RCP45.TIF")
+
+proj2061_2070_45_THRESHOLD10 <- proj2061_2070_45 > thr
+plot(proj2061_2070_45_THRESHOLD10, main="2061_2070")
+writeRaster(proj2061_2070_45_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2061_2070RCP45.TIF")
+
+proj2071_2080_45_THRESHOLD10 <- proj2071_2080_45 > thr
+plot(proj2071_2080_45_THRESHOLD10, main="2071_2080")
+writeRaster(proj2071_2080_45_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2071_2080RCP45.TIF")
+
+proj2081_2090_45_THRESHOLD10 <- proj2081_2090_45 > thr
+plot(proj2081_2090_45_THRESHOLD10, main="2081_2090")
+writeRaster(proj2081_2090_45_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2081_2090RCP45.TIF")
+
+proj2091_2100_45_THRESHOLD10 <- proj2091_2100_45 > thr
+plot(proj2091_2100_45_THRESHOLD10, main="2091_2100")
+writeRaster(proj2091_2100_45_THRESHOLD10, "D:/quercus/Partage/Pep/Gentiana_Alpina_David/MODEL_DEFINITIU/Projeccions_llindar10/proj2091_2100RCP45.TIF")
+
+
+```

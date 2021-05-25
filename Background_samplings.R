@@ -30,9 +30,9 @@ datatrans<-spdf <- SpatialPointsDataFrame(coords      = coords,
                                           data        = data, 
                                           proj4string = crs)
 class(datatrans)
-pt.kde <- sp.kde(x = datatrans, bw = 5, standardize = T, 
+pt.kde <- sp.kde(x = datatrans, bw = 3, standardize = T, 
                  newdata = obre, scale.factor = 1 )
-writeRaster(pt.kde, "C:/Users/munozferrandiz/Desktop/Projeccions prov/Provaraster1961_2020_5_OCCST.tif", overwrite=T)
+writeRaster(pt.kde, "C:/Users/munozferrandiz/Desktop/Projeccions prov/Provaraster1961_2020_3_OCCST.tif", overwrite=T)
 plot(pt.kde)
 
 ################################ BW 1 ###########################################
@@ -51,9 +51,9 @@ datatrans<-spdf <- SpatialPointsDataFrame(coords      = coords,
                                           data        = data, 
                                           proj4string = crs)
 class(datatrans)
-pt.kde <- sp.kde(x = datatrans, bw = 1, standardize = T, 
+pt.kde <- sp.kde(x = datatrans, bw = 3, standardize = T, 
                  newdata = obre, scale.factor = 1 )
-writeRaster(pt.kde, "C:/Users/munozferrandiz/Desktop/Projeccions prov/Provaraster1961_2020_1_OCCST.tif", overwrite=T)
+writeRaster(pt.kde, "C:/Users/munozferrandiz/Desktop/Projeccions prov/Provaraster1961_2020_3_OCCST.tif", overwrite=T)
 plot(pt.kde)
 
 #################################################################################

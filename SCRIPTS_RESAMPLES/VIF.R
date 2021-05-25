@@ -36,11 +36,31 @@ vif(taula[,c(9,12,21,23:25,30:32,34:36)])   #treient BIO4
 vif(taula[,c(9,12,21,23:25,30:32,35,36)])   #treient PETseasonality
 vif(taula[,c(9,12,21,23,25,30:32,35,36)])   #treient PETseasonality
 
-#Aquestes últimes variables són les que no presenten multicolinearitat. Ara els posarem un màxim de 
-#correlació. 
+#Aquestes ?ltimes variables s?n les que no presenten multicolinearitat. Ara els posarem un m?xim de 
+#correlaci?. 
 
-vifcor(taula[,c(9,12,21,23,25,30:32,35,36)], th=.7) #Aquí hem eliminat les variables que tenen presenten
-#una correlació per sobre de 0.7. 
+vifcor(taula[,c(9,12,21,23,25,30:32,35,36)], th=.7) #Aqu? hem eliminat les variables que tenen presenten
+#una correlaci? per sobre de 0.7. 
 
 ecospat.cor.plot(taula[,c(9,12,21,23,25,30:32,35,36)])
 
+
+
+
+library(raster)            
+library(ecospat)
+library(usdm)
+taula1<-read.csv("D:/Bioclimatiques_rcp45/extract_ST_LATAULABIO_1961_2020.csv", header = T, sep = ";")
+
+ecospat.cor.plot(taula[, 3:25])
+vif(taula1[2:31])
+vif(taula1[,c(3, 8, 10, 15, 17, 21:22,24,30)])   #treient BIO5
+
+
+#Aquestes ?ltimes variables s?n les que no presenten multicolinearitat. Ara els posarem un m?xim de 
+#correlaci?. 
+
+vifcor(taula1[,c(3, 8, 10, 15, 17, 21:22,24,30)] , th=.7) #Aqu? hem eliminat les variables que tenen presenten
+#una correlaci? per sobre de 0.7. 
+
+ecospat.cor.plot(taula[,c(9,12,21,23,25,30:32,35,36)])
